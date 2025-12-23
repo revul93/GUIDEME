@@ -1,0 +1,17 @@
+{
+  "name": "guideme",
+  "version": "1.0.0",
+  "description": "Dental Cases Management and Tracking Web App",
+  "homepage": "https://github.com/revul93/guideme#readme",
+  "bugs": {
+    "url": "https://github.com/revul93/guideme/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/revul93/guideme.git"
+  },
+  "license": "ISC",
+  "author": "revul93",
+  "type": "module",
+  "main": "index.js"
+}
