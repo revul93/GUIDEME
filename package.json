@@ -13,5 +13,11 @@
   "license": "ISC",
   "author": "revul93",
   "type": "module",
-  "main": "index.js"
+  "main": "index.js",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\""
+  }
 }

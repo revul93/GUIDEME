@@ -1,0 +1,237 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ===================================================================
+// ENUMS
+// ===================================================================
+
+enum UserRole {
+  client
+  designer
+}
+
+enum ClientType {
+  doctor
+  lab
+}
+
+enum DentalSpecialty {
+  GENERAL_DENTISTRY
+  ORTHODONTICS
+  PERIODONTICS
+  ENDODONTICS
+  PROSTHODONTICS
+  ORAL_SURGERY
+  PEDIATRIC_DENTISTRY
+  COSMETIC_DENTISTRY
+  IMPLANTOLOGY
+  ORAL_PATHOLOGY
+  OTHER
+}
+
+enum OtpChannel {
+  email
+  whatsapp
+}
+
+enum OtpPurpose {
+  login
+  register
+}
+
+enum AccountStatus {
+  active
+  suspended
+  deleted
+}
+
+enum FailedLoginReason {
+  wrong_otp
+  account_locked
+  account_suspended
+}
+
+// ===================================================================
+// CORE USER & PROFILE MODELS
+// ===================================================================
+
+model User {
+  id Int @id @default(autoincrement())
+
+  // Authentication
+  email       String   @unique
+  phoneNumber String?  @unique
+  role        UserRole @default(client)
+
+  // Verification
+  emailVerified Boolean @default(false)
+  phoneVerified Boolean @default(false)
+
+  // Account status
+  accountStatus AccountStatus @default(active)
+
+  // Lockout fields
+  failedLoginAttempts Int       @default(0)
+  lastFailedLoginAt   DateTime?
+  isLocked            Boolean   @default(false)
+  lockedAt            DateTime?
+  lockedUntil         DateTime?
+  lockReason          String?
+
+  // Timestamps
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastLoginAt DateTime?
+  deletedAt   DateTime?
+
+  // Relations - Authentication
+  otpCodes     OtpCode[]
+  loginHistory LoginHistory[]
+
+  // Relations - Profiles (one-to-one)
+  clientProfile   ClientProfile?
+  designerProfile DesignerProfile?
+
+  @@index([email])
+  @@index([phoneNumber])
+  @@index([role])
+  @@index([accountStatus])
+}
+
+model ClientProfile {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  clientType ClientType
+  name       String
+
+  // Professional info (mainly for doctors)
+  specialty      DentalSpecialty?
+  specialtyOther String?
+
+  // Organization info
+  clinicName String? // For doctors
+  labName    String? // For labs
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  addresses    Address[]
+
+  @@index([clientType])
+}
+
+model DesignerProfile {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name String
+
+  // Designer info
+  specialization  String?
+  experienceYears Int?
+  bio             String?
+
+  // Admin & Permissions
+  isAdmin          Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isAdmin])
+}
+
+model Address {
+  id              Int           @id @default(autoincrement())
+  clientProfileId Int
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
+
+  label String?
+
+  // Address fields
+  country    String
+  city       String
+  district   String?
+  street     String
+  building   String?
+  postalCode String?
+
+  // Google Maps (optional)
+  latitude  Float?
+  longitude Float?
+  placeId   String?
+
+  isDefault Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientProfileId, isDefault])
+}
+
+// ===================================================================
+// AUTHENTICATION
+// ===================================================================
+
+model OtpCode {
+  id Int @id @default(autoincrement())
+
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  identifier String // email or phone number
+  code       String
+  channel    OtpChannel
+  purpose    OtpPurpose
+
+  expiresAt DateTime
+  isUsed    Boolean   @default(false)
+  usedAt    DateTime?
+  attempts  Int       @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, isUsed, expiresAt])
+  @@index([identifier, channel, purpose, isUsed, expiresAt])
+  @@index([expiresAt])
+}
+
+model LoginHistory {
+  id Int @id @default(autoincrement())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Login details
+  ipAddress  String?
+  userAgent  String?
+  location   String?
+  deviceInfo String?
+
+  success       Boolean
+  failureReason FailedLoginReason?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([success, createdAt])
+}
+
+model TokenBlacklist {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token, expiresAt])
+  @@index([userId])
+}
