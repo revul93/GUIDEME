@@ -1,1 +1,283 @@
-{}
+{
+  "nav": {
+    "home": "Home",
+    "whoWeAre": "Who We Are",
+    "howWeWork": "How It Works",
+    "values": "Values",
+    "services": "Services",
+    "team": "Team",
+    "contact": "Contact",
+
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+
+    "dashboard": "Dashboard",
+    "myCases": "My Cases",
+    "newCase": "New Case",
+    "payments": "Payments",
+    "myInfo": "My Info",
+    "profile": "Profile",
+
+    "systemSettings": "Settings"
+  },
+  "hero": {
+    "title": "Your Partner in Guided Dental Surgery",
+    "subtitle": "Designed by specialists for specialists.",
+    "cta": "Know More",
+    "stats": {
+      "cases": "Cases Completed",
+      "success": "Success Rate",
+      "response": "Response Time"
+    }
+  },
+  "whoWeAre": {
+    "title": "Who We Are",
+    "cloud": {
+      "title": "Cloud-Based Digital Lab",
+      "text": "A cloud-based digital dental laboratory, built and led by specialized dental clinicians."
+    },
+    "precision": {
+      "title": "Precision Engineering",
+      "text": "Operating at the intersection of clinical science and advanced digital engineering."
+    },
+    "outcomes": {
+      "title": "Predictable Outcomes",
+      "text": "High-accuracy surgical guides and digitally planned workflows designed for prosthetically driven results."
+    },
+    "statement": "We deliver precision-driven solutions in implant dentistry and comprehensive laboratory services, focusing on predictable outcomes."
+  },
+  "howWeWork": {
+    "title": "How We Work",
+    "subtitle": "A streamlined process to ensure precision and efficiency in every case",
+    "steps": {
+      "step1": {
+        "title": "Submit Case",
+        "description": "Upload case details, clinical notes and case documents"
+      },
+      "step2": {
+        "title": "Digital Planning",
+        "description": "Our expert team creates a detailed surgical study guide"
+      },
+      "step3": {
+        "title": "Delivery & Support",
+        "description": "Receive your guides with ongoing support from our specialists"
+      }
+    }
+  },
+  "values": {
+    "title": "Our Values",
+    "subtitle": "The principles that guide everything we do",
+    "mission": {
+      "title": "Our Mission",
+      "description": "To empower dentists and dental labs with reliable digital planning, precise surgical guides, and a seamless case-submission experience—delivering clarity and confidence in every treatment."
+    },
+    "vision": {
+      "title": "Our Vision",
+      "description": "To become the trusted digital partner for clinicians worldwide—where every dental implant treatment begins with structured diagnostics, guided workflows, and uncompromising precision."
+    }
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Comprehensive digital dental solutions designed for precision and excellence.",
+    "surgical": {
+      "title": "Surgical Guides",
+      "description": "High-precision 3D printed surgical guides for implant placement."
+    },
+    "studyDesign": {
+      "title": "Study & Design",
+      "description": "Comprehensive digital treatment planning and surgical study services.",
+      "feature1": "Digital Implant Planning",
+      "feature2": "3D Visualization",
+      "feature3": "Prosthetic-Driven Design"
+    },
+    "production": {
+      "title": "Production & Manufacturing",
+      "description": "State-of-the-art 3D printing and manufacturing of dental surgical guides.",
+      "feature1": "High-Precision 3D Printing",
+      "feature2": "Quality Assurance",
+      "feature3": "Fast Turnaround Times"
+    },
+    "fullArch": {
+      "title": "Full Arch Solutions",
+      "description": "All-on-4/6 planning and guided surgery for complete arch restorations.",
+      "feature1": "Comprehensive Planning",
+      "feature2": "Multi-Unit Support",
+      "feature3": "Prosthetically Driven Outcomes"
+    },
+    "gbr": {
+      "title": "GBR Planning",
+      "description": "Guided Bone Regeneration planning and membrane placement services.",
+      "feature1": "Bone Augmentation Planning",
+      "feature2": "Membrane Design",
+      "feature3": "Precise Surgical Execution"
+    }
+  },
+  "team": {
+    "title": "Our Team",
+    "subtitle": "Meet the specialists behind GuideMe's precision solutions.",
+    "member1": {
+      "name": "Ahmed Al-Rashid",
+      "role": "Chief Clinical Officer",
+      "bio": "15+ years in dental implantology"
+    },
+    "member2": {
+      "name": "Sara Al-Mansour",
+      "role": "Lead Prosthodontist",
+      "bio": "Surgical guide design specialist"
+    },
+    "member3": {
+      "name": "Khalid Al-Otaibi",
+      "role": "Digital Design Lead",
+      "bio": "Expert in CAD/CAM dental design"
+    },
+    "member4": {
+      "name": "Fatima Al-Zahrani",
+      "role": "Surgical Planning Specialist",
+      "bio": "Dedicated to exceptional support"
+    }
+  },
+  "contact": {
+    "title": "Ready to Get Started?",
+    "subtitle": "Let's work together on your next case",
+    "ready": "Ready to Transform Your Practice?",
+    "description": "Join hundreds of satisfied clinicians who trust GuideMe for their digital implant planning and surgical guide needs.",
+    "getStarted": "Get Started Today",
+    "registerMessage": "Register for an account to start submitting cases",
+    "phone": "Phone",
+    "email": "Email",
+    "location": "Location",
+    "address": "123 Dental Street, Medical District",
+    "trustBadge": "Trusted by 500+ dental professionals"
+  },
+
+  "settings": {
+    "theme": "Theme",
+    "language": "Language",
+    "lightMode": "Light",
+    "darkMode": "Dark"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Login to your account",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Register now"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Join GuideMe today",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Login"
+    },
+    "loginMethod": {
+      "title": "Choose login method",
+      "whatsapp": "WhatsApp",
+      "email": "Email"
+    },
+    "contactMethod": {
+      "title": "How should we contact you?",
+      "whatsapp": "WhatsApp",
+      "email": "Email"
+    },
+    "otpChannel": {
+      "title": "Choose verification method",
+      "hint": "We'll send you a 6-digit code"
+    },
+    "fields": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "phoneHint": "Enter 9 digits starting with 5",
+      "specialty": "Specialty",
+      "specialtyOther": "Specify your specialty",
+      "clinicName": "Clinic/Practice Name",
+      "otp": "Verification Code"
+    },
+    "specialties": {
+      "generalDentistry": "General Dentistry",
+      "orthodontics": "Orthodontics",
+      "periodontics": "Periodontics",
+      "endodontics": "Endodontics",
+      "prosthodontics": "Prosthodontics",
+      "oralSurgery": "Oral Surgery",
+      "pediatricDentistry": "Pediatric Dentistry",
+      "cosmeticDentistry": "Cosmetic Dentistry",
+      "implantology": "Implantology",
+      "oralPathology": "Oral Pathology",
+      "other": "Other"
+    },
+    "steps": {
+      "step1": "Personal Info",
+      "step2": "Professional Info"
+    },
+    "buttons": {
+      "next": "Next",
+      "back": "Back",
+      "submit": "Submit"
+    },
+    "sendOtp": "Send Verification Code",
+    "verify": "Verify & Continue",
+    "sending": "Sending...",
+    "verifying": "Verifying...",
+    "otp": {
+      "sentTo": "Verification code sent to:",
+      "resendIn": "Resend code in",
+      "seconds": "seconds",
+      "resend": "Resend Code"
+    },
+    "errors": {
+      "emailRequired": "Email address is required",
+      "emailTooLong": "Email address is too long (max 254 characters)",
+      "invalidEmailFormat": "Please enter a valid email address",
+      "phoneRequired": "Phone number is required",
+      "phoneOnlyNumbers": "Phone number must contain only numbers",
+      "phoneLength": "Phone number must be exactly 9 digits",
+      "phoneStartWith5": "Phone number must start with 5",
+      "firstNameRequired": "First name is required",
+      "firstNameTooShort": "First name must be at least 2 characters",
+      "firstNameTooLong": "First name is too long (max 50 characters)",
+      "firstNameInvalidCharacters": "First name contains invalid characters",
+      "lastNameRequired": "Last name is required",
+      "lastNameTooShort": "Last name must be at least 2 characters",
+      "lastNameTooLong": "Last name is too long (max 50 characters)",
+      "lastNameInvalidCharacters": "Last name contains invalid characters",
+      "clinicNameRequired": "Clinic name is required",
+      "clinicNameTooShort": "Clinic name must be at least 2 characters",
+      "clinicNameTooLong": "Clinic name is too long (max 100 characters)",
+      "specialtyRequired": "Please select your specialty",
+      "specialtyOtherRequired": "Please specify your specialty",
+      "specialtyOtherTooShort": "Specialty must be at least 2 characters",
+      "specialtyOtherTooLong": "Specialty is too long (max 100 characters)",
+      "otpRequired": "Verification code is required",
+      "otpInvalid": "Verification code must be 6 digits",
+      "serverError": "An error occurred. Please try again."
+    },
+    "success": {
+      "otpSent": "Verification code sent successfully",
+      "loginSuccess": "Login successful! Redirecting...",
+      "registerSuccess": "Registration successful! Redirecting..."
+    }
+  },
+  "dashboard": {
+    "cases": {
+      "title": "My Cases",
+      "filters": {
+        "all": "All Cases",
+        "draft": "Draft",
+        "ready": "Ready",
+        "submitted": "Submitted",
+        "inProduction": "In Production",
+        "awaitingAction": "Awaiting Action",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "searchPlaceholder": "Search cases by patient name or ID...",
+      "noSearchResults": "No cases match your search",
+      "noCases": "No cases found",
+      "noCasesDescription": "You have not submitted any cases yet.  Submit your first case now",
+      "submitCase": "Submit Case"
+    }
+  }
+}
