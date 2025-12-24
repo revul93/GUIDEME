@@ -47,83 +47,67 @@ const Team = () => {
       .slice(0, 2);
   };
 
-  const getColorFromName = (name) => {
-    const colors = [
-      "from-blue-500 to-blue-600",
-      "from-purple-500 to-purple-600",
-      "from-pink-500 to-pink-600",
-      "from-secondary to-secondary-dark",
-      "from-primary to-primary-dark",
-      "from-orange-500 to-orange-600",
-    ];
-    const index = name.charCodeAt(0) % colors.length;
-    return colors[index];
-  };
-
   return (
     <section
       id="team"
-      className="py-12 md:py-20 bg-slate-50 dark:bg-slate-900 scroll-mt-20"
+      className="py-12 md:py-16 bg-gray-50 dark:bg-gray-900 scroll-mt-20"
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-10 md:mb-16">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-2 md:mb-4">
+        <div className="text-center max-w-3xl mx-auto mb-8 md:mb-12 animate-fade-in">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary dark:text-light mb-3">
             {t("team.title")}
           </h2>
-          <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-400">
+          <p className="text-sm sm:text-base text-charcoal dark:text-gray-400">
             {t("team.subtitle")}
           </p>
         </div>
 
-        {/* Team Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+        {/* Team Grid - Compact */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
           {teamMembers.map((member) => (
             <div
               key={member.id}
-              className="group bg-white dark:bg-gray-800 rounded-2xl p-4 md:p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
+              className="bg-light dark:bg-gray-800 rounded-xl p-5 text-center border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl animate-scale-in"
+              style={{ animationDelay: `${member.id * 100}ms` }}
             >
               {/* Avatar */}
-              <div className="relative inline-block mb-3 md:mb-4">
-                <div
-                  className={`w-20 md:w-24 h-20 md:h-24 rounded-full bg-gradient-to-br ${getColorFromName(
-                    member.name
-                  )} flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow`}
-                >
-                  <span className="text-xl md:text-2xl font-bold text-white">
+              <div className="relative inline-block mb-3">
+                <div className="w-20 h-20 rounded-full bg-primary dark:bg-accent flex items-center justify-center shadow-md">
+                  <span className="text-xl font-bold text-light">
                     {getInitials(member.name)}
                   </span>
                 </div>
-                <div className="absolute bottom-0 right-0 rtl:right-auto rtl:left-0 w-5 md:w-6 h-5 md:h-6 bg-secondary border-2 md:border-4 border-white dark:border-gray-800 rounded-full"></div>
+                <div className="absolute bottom-0 right-0 rtl:right-auto rtl:left-0 w-5 h-5 bg-accent-secondary dark:bg-accent border-3 border-light dark:border-gray-800 rounded-full"></div>
               </div>
 
               {/* Info */}
-              <h3 className="text-base md:text-xl font-bold text-gray-900 dark:text-white mb-1 md:mb-2">
+              <h3 className="text-base font-bold text-primary dark:text-light mb-1">
                 {member.name}
               </h3>
-              <p className="text-xs md:text-sm text-secondary font-medium mb-2 md:mb-3">
+              <p className="text-xs text-accent dark:text-accent-secondary font-medium mb-2">
                 {member.role}
               </p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
+              <p className="text-xs text-charcoal dark:text-gray-400 mb-4">
                 {member.bio}
               </p>
 
               {/* Stats */}
-              <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-200 dark:border-gray-700">
-                <div className="grid grid-cols-2 gap-2 md:gap-4">
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <div className="text-xl md:text-2xl font-bold text-primary dark:text-secondary">
+                    <div className="text-xl font-bold text-accent dark:text-accent-secondary">
                       {member.cases}
                     </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">
+                    <div className="text-xs text-charcoal dark:text-gray-400">
                       {t("team.cases")}
                     </div>
                   </div>
                   <div>
-                    <div className="text-xl md:text-2xl font-bold text-primary dark:text-secondary">
+                    <div className="text-xl font-bold text-accent dark:text-accent-secondary">
                       {member.experience}
                     </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">
+                    <div className="text-xs text-charcoal dark:text-gray-400">
                       {t("team.experience")}
                     </div>
                   </div>

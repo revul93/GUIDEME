@@ -56,6 +56,112 @@ enum FailedLoginReason {
   account_suspended
 }
 
+enum ProcedureCategory {
+  single_implant
+  multiple_implant
+  full_arch
+  gbr
+  other
+}
+
+enum GuideType {
+  tooth_support
+  tissue_support
+  bone_support
+  stackable
+  hybrid
+  other
+}
+
+enum RequiredService {
+  study_only
+  full_solution
+}
+
+enum ImplantSystem {
+  nobel_biocare
+  straumann
+  zimmer_biomet
+  osstem
+  hiossen
+  dentium
+  megagen
+  bicon
+  neodent
+  other
+}
+
+enum DeliveryMethod {
+  pickup
+  delivery
+}
+
+enum CaseStatus {
+  // Initial states
+  pending_study_payment_verification
+  submitted
+
+  // Study phase
+  study_in_progress
+  study_completed
+
+  // Quote phase
+  quote_pending
+  quote_sent
+  quote_accepted
+  quote_rejected
+
+  // Payment phase
+  pending_production_payment_verification
+
+  // Production phase
+  in_production
+  pending_response
+  production_completed
+
+  // Delivery phase
+  ready_for_pickup
+  out_for_delivery
+  delivered
+
+  // Final states
+  completed
+  cancelled
+  refund_requested
+  refunded
+}
+
+enum FileCategory {
+  dicom
+  stl
+  ply
+  zip
+  clinical_photo
+  prescription
+  study_file
+  design_file
+  production_file
+  other
+}
+
+enum PaymentStatus {
+  pending
+  verified
+  failed
+  refunded
+}
+
+enum PaymentMethod {
+  bank_transfer
+  cash
+  hyperpay
+}
+
+enum PaymentType {
+  study_fee
+  production_fee
+  delivery_fee
+}
 // ===================================================================
 // CORE USER & PROFILE MODELS
 // ===================================================================
@@ -124,6 +230,9 @@ model ClientProfile {
 
   // Relations
   addresses    Address[]
+  cases        Case[]
+  caseComments CaseComment[]
+  payments     Payment[]
 
   @@index([clientType])
 }
@@ -145,6 +254,13 @@ model DesignerProfile {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relations
+  caseStatusUpdates CaseStatusHistory[]
+  caseComments      CaseComment[]
+  studiesCompleted  Case[]              @relation("StudyCompletedBy")
+  quotesCreated     CaseQuote[]         @relation("QuoteCreatedBy")
+  paymentsVerified  Payment[]           @relation("PaymentVerifiedBy")
 
   @@index([isAdmin])
 }
@@ -173,6 +289,9 @@ model Address {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relations
+  casesForDelivery Case[]
 
   @@index([clientProfileId, isDefault])
 }
@@ -234,4 +353,317 @@ model TokenBlacklist {
 
   @@index([token, expiresAt])
   @@index([userId])
+}
+
+// ===================================================================
+// CASE MANAGEMENT
+// ===================================================================
+
+model Case {
+  id         Int    @id @default(autoincrement())
+  caseNumber String @unique
+
+  // Client info (can be doctor or lab)
+  clientProfileId Int
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
+
+  // Patient info
+  patientRef     String? // Optional patient reference  
+
+  // Procedure details
+  procedureCategory ProcedureCategory
+  guideType         GuideType
+  requiredService   RequiredService
+
+  // Clinical details
+  implantSystem      ImplantSystem?
+  implantSystemOther String?
+  teethNumbers       String? // JSON array or comma-separated
+
+  // Case description
+  clinicalNotes       String?
+  specialInstructions String?
+
+  // Status and workflow
+  status      CaseStatus
+  submittedAt DateTime?
+
+  // Study tracking
+  studyCompletedAt   DateTime?
+  studyCompletedById Int?
+  studyCompletedBy   DesignerProfile? @relation("StudyCompletedBy", fields: [studyCompletedById], references: [id])
+
+  // Delivery info
+  deliveryMethod        DeliveryMethod?
+  deliveryAddressId     Int?
+  deliveryAddress       Address?        @relation(fields: [deliveryAddressId], references: [id])
+  pickupBranchId        Int?
+  pickupBranch          Branch?         @relation(fields: [pickupBranchId], references: [id])
+  actualDeliveryDate    DateTime?
+
+  // Timestamps
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  completedAt        DateTime?
+  cancelledAt        DateTime?
+  cancellationReason String?
+
+  // Relations
+  files         CaseFile[]
+  comments      CaseComment[]
+  statusHistory CaseStatusHistory[]
+  quotes        CaseQuote[]
+  payments      Payment[]
+
+  @@index([clientProfileId, status])
+  @@index([caseNumber])
+  @@index([status, createdAt])
+}
+
+model CaseFile {
+  id     Int  @id @default(autoincrement())
+  caseId Int
+  case   Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  fileName String
+  fileUrl  String
+  fileType String // MIME type
+  fileSize Int // bytes
+  category FileCategory @default(other)
+
+  description  String?
+  uploadedBy   String // "client" or "designer"
+  uploadedById Int? // profileId (clientProfileId or designerProfileId)
+
+  createdAt DateTime @default(now())
+
+  @@index([caseId, category])
+}
+
+model CaseComment {
+  id     Int  @id @default(autoincrement())
+  caseId Int
+  case   Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  // Author (either client or designer)
+  authorType        String // "client" or "designer"
+  clientProfileId   Int?
+  clientProfile     ClientProfile?   @relation(fields: [clientProfileId], references: [id])
+  designerProfileId Int?
+  designerProfile   DesignerProfile? @relation(fields: [designerProfileId], references: [id])
+
+  comment String
+
+  // Optional: attach files to comments
+  attachments String? // JSON array of file URLs
+
+  isRead Boolean   @default(false)
+  readAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([caseId, createdAt])
+  @@index([caseId, isRead])
+}
+
+model CaseStatusHistory {
+  id     Int  @id @default(autoincrement())
+  caseId Int
+  case   Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  fromStatus CaseStatus?
+  toStatus   CaseStatus
+
+  // Track who changed it
+  changedBy       String // "client", "designer", "system"
+  changedById     Int? // profileId
+  designerProfile DesignerProfile? @relation(fields: [changedById], references: [id])
+
+  notes String?
+
+  createdAt DateTime @default(now())
+
+  @@index([caseId, createdAt])
+}
+
+// ===================================================================
+// QUOTES & PAYMENTS
+// ===================================================================
+
+model CaseQuote {
+  id          Int    @id @default(autoincrement())
+  quoteNumber String @unique
+
+  caseId Int
+  case   Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  // Pricing (SAR)
+  studyFee      Float @default(100)
+  designFee     Float @default(0)
+  productionFee Float @default(0)
+  deliveryFee   Float @default(0)
+
+  subtotal       Float
+  discountAmount Float   @default(0)
+  discountReason String?
+
+  vatRate     Float @default(15) // percentage
+  vatAmount   Float
+  totalAmount Float
+
+  // Status
+  isSent Boolean   @default(false)
+  sentAt DateTime?
+
+  isAccepted Boolean   @default(false)
+  acceptedAt DateTime?
+
+  isRejected      Boolean   @default(false)
+  rejectedAt      DateTime?
+  rejectionReason String?
+
+  validUntil DateTime?
+
+  // Created by designer
+  createdById Int
+  createdBy   DesignerProfile @relation("QuoteCreatedBy", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  payments Payment[]
+
+  @@index([caseId])
+  @@index([quoteNumber])
+  @@index([createdById])
+}
+
+
+model Payment {
+  id            Int    @id @default(autoincrement())
+  paymentNumber String @unique
+
+  // Links
+  caseId Int
+  case   Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  quoteId Int?
+  quote   CaseQuote? @relation(fields: [quoteId], references: [id])
+
+  clientProfileId Int
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id])
+
+  // Payment details
+  paymentType PaymentType
+  amount      Float
+  currency    String      @default("SAR")
+
+  paymentMethod PaymentMethod
+  status        PaymentStatus @default(pending)
+
+  // Payment proof (for bank transfer)
+  proofUrl        String?
+  proofUploadedAt DateTime?
+
+  // HyperPay integration
+  hyperPayCheckoutId   String?
+  hyperPayResourcePath String?
+
+  // Card details (last 4 digits only)
+  cardLast4 String?
+  cardBrand String?
+
+  // Transaction tracking
+  transactionId   String?
+  transactionDate DateTime?
+
+  // Verification (by designer/admin)
+  isVerified      Boolean          @default(false)
+  verifiedById    Int?
+  verifiedBy      DesignerProfile? @relation("PaymentVerifiedBy", fields: [verifiedById], references: [id])
+  verifiedAt      DateTime?
+  rejectionReason String?
+
+  // Refund
+  isRefunded     Boolean   @default(false)
+  refundedAmount Float?
+  refundedAt     DateTime?
+  refundReason   String?
+
+  // Metadata
+  notes     String?
+  ipAddress String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([caseId, status])
+  @@index([clientProfileId])
+  @@index([paymentType, status])
+  @@index([transactionId])
+  @@index([verifiedById])
+}
+
+// ===================================================================
+// SERVICE CATALOG & BRANCH
+// ===================================================================
+
+model ServiceCatalog {
+  id   Int    @id @default(autoincrement())
+  code String @unique
+
+  procedureCategory ProcedureCategory
+  guideType         GuideType
+  requiredService   RequiredService
+
+  name          String
+  nameAr        String
+  description   String?
+  descriptionAr String?
+
+  // Pricing
+  studyFee          Float  @default(100)
+  baseDesignFee     Float  @default(0)
+  baseProductionFee Float  @default(0)
+  perToothFee       Float? // Additional fee per tooth
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([procedureCategory, guideType, requiredService])
+  @@index([isActive])
+}
+
+model Branch {
+  id     Int     @id @default(autoincrement())
+  name   String
+  nameAr String?
+
+  // Address
+  city     String
+  district String?
+  street   String
+  phone    String?
+  email    String?
+
+  // Google Maps
+  latitude  Float?
+  longitude Float?
+
+  // Working hours
+  workingHours String? // JSON or formatted string
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  casesForPickup Case[]
+
+  @@index([isActive])
 }

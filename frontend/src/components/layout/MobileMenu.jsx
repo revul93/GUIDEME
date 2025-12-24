@@ -64,7 +64,7 @@ const MobileMenu = ({
       />
 
       {/* Full Page Menu */}
-      <div className="fixed inset-0 bg-white dark:bg-dark z-[70] lg:hidden flex flex-col">
+      <div className="fixed inset-0 bg-light dark:bg-dark z-[70] lg:hidden flex flex-col">
         {/* Header */}
         <div className="flex-shrink-0 flex items-center justify-between px-4 h-16 border-b border-gray-200 dark:border-gray-800">
           <img
@@ -74,7 +74,7 @@ const MobileMenu = ({
           />
           <button
             onClick={onClose}
-            className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
+            className="p-2 text-charcoal dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
           >
             <CloseIcon className="w-6 h-6" />
           </button>
@@ -87,12 +87,12 @@ const MobileMenu = ({
             {isLoggedIn && user && (
               <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <AccountCircleIcon className="w-12 h-12 text-primary dark:text-secondary" />
+                  <AccountCircleIcon className="w-12 h-12 text-primary dark:text-accent" />
                   <div>
-                    <p className="font-semibold text-gray-900 dark:text-white">
+                    <p className="font-semibold text-primary dark:text-light">
                       {user.firstName} {user.lastName}
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-charcoal dark:text-gray-400">
                       {user.email}
                     </p>
                   </div>
@@ -108,8 +108,8 @@ const MobileMenu = ({
                   onClick={() => handleNavClick(link)}
                   className={`w-full text-center px-4 py-2.5 rounded-lg transition-all font-medium text-sm cursor-pointer ${
                     activeSection === link.section
-                      ? "bg-primary dark:bg-secondary text-white shadow-md"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-secondary/20 dark:hover:bg-secondary/20 hover:text-secondary-dark dark:hover:text-secondary"
+                      ? "bg-primary dark:bg-accent text-light shadow-md"
+                      : "text-charcoal dark:text-gray-300 hover:bg-accent/20 dark:hover:bg-accent/20 hover:text-accent dark:hover:text-accent-secondary"
                   }`}
                 >
                   {link.label}
@@ -122,14 +122,14 @@ const MobileMenu = ({
               <div className="space-y-3 mb-6">
                 <button
                   onClick={handleLoginClick}
-                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-medium transition-all cursor-pointer"
+                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-primary dark:text-light rounded-lg font-medium transition-all cursor-pointer"
                 >
                   <LoginIcon className="w-5 h-5" />
                   <span>{t("nav.login")}</span>
                 </button>
                 <button
                   onClick={handleRegisterClick}
-                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary dark:bg-secondary text-white hover:bg-primary-dark dark:hover:bg-secondary-dark rounded-lg font-medium transition-all shadow-md cursor-pointer"
+                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary dark:bg-accent text-light hover:bg-primary/90 dark:hover:bg-accent/90 rounded-lg font-medium transition-all shadow-md cursor-pointer"
                 >
                   <PersonAddIcon className="w-5 h-5" />
                   <span>{t("nav.register")}</span>
@@ -140,12 +140,12 @@ const MobileMenu = ({
                 <Link
                   to="/dashboard/profile"
                   onClick={onClose}
-                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-medium transition-all cursor-pointer"
+                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-primary dark:text-light rounded-lg font-medium transition-all cursor-pointer"
                 >
                   <AccountCircleIcon className="w-5 h-5" />
                   <span>{t("nav.profile")}</span>
                 </Link>
-                <button className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-medium transition-all relative cursor-pointer">
+                <button className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-primary dark:text-light rounded-lg font-medium transition-all relative cursor-pointer">
                   <NotificationsIcon className="w-5 h-5" />
                   <span>{t("nav.notifications")}</span>
                   <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
@@ -166,7 +166,7 @@ const MobileMenu = ({
                 onClick={() => {
                   toggleTheme();
                 }}
-                className="w-full flex items-center justify-between px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all cursor-pointer"
+                className="w-full flex items-center justify-between px-4 py-3 text-charcoal dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all cursor-pointer"
               >
                 <span className="font-medium">{t("settings.theme")}</span>
                 <div className="flex items-center gap-2">
@@ -188,7 +188,7 @@ const MobileMenu = ({
                 onClick={() => {
                   toggleLanguage();
                 }}
-                className="w-full flex items-center justify-between px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all cursor-pointer"
+                className="w-full flex items-center justify-between px-4 py-3 text-charcoal dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all cursor-pointer"
               >
                 <span className="font-medium">{t("settings.language")}</span>
                 <div className="flex items-center gap-2">

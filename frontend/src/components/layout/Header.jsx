@@ -111,7 +111,7 @@ const Header = () => {
       "portfolio",
       "values",
       "team",
-      "let-us-start",
+      "contact",
     ];
 
     sections.forEach((sectionId) => {
@@ -201,7 +201,7 @@ const Header = () => {
           {
             id: "my-cases",
             label: t("nav.myCases"),
-            path: "/dashboard/my-cases",
+            path: "/dashboard/cases",
           },
           {
             id: "new-case",
@@ -284,8 +284,8 @@ const Header = () => {
       <header
         className={`fixed top-0 w-full z-50 transition-all duration-300 ${
           isScrolled
-            ? "bg-white/80 dark:bg-dark/80 backdrop-blur-lg shadow-lg"
-            : "bg-white dark:bg-dark"
+            ? "bg-light/90 dark:bg-dark/90 backdrop-blur-lg shadow-lg"
+            : "bg-light dark:bg-dark"
         }`}
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -295,7 +295,7 @@ const Header = () => {
               className="flex items-center transition-all duration-300"
             >
               <img
-                src={isDark ? "/logo-inversed.png" : "/logo.png"}
+                src={isDark ? "/brand.svg" : "/brand.svg"}
                 alt="GuideMe Logo"
                 className="h-10 w-auto object-contain"
               />
@@ -307,14 +307,14 @@ const Header = () => {
                   <>
                     <button
                       onClick={handleLoginClick}
-                      className="inline-flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg font-medium transition-all cursor-pointer"
+                      className="inline-flex items-center gap-2 px-4 py-2 text-charcoal dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg font-medium transition-all cursor-pointer"
                     >
                       <LoginIcon className="w-5 h-5" />
                       <span>{t("nav.login")}</span>
                     </button>
                     <button
                       onClick={handleRegisterClick}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-primary dark:bg-secondary text-white hover:bg-primary-dark dark:hover:bg-secondary-dark rounded-lg font-medium transition-all shadow-md hover:shadow-lg cursor-pointer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-primary dark:bg-accent text-light hover:bg-primary/90 dark:hover:bg-accent/90 rounded-lg font-medium transition-all shadow-md hover:shadow-lg cursor-pointer"
                     >
                       <PersonAddIcon className="w-5 h-5" />
                       <span>{t("nav.register")}</span>
@@ -324,13 +324,13 @@ const Header = () => {
                   <>
                     <Link
                       to="/dashboard/profile"
-                      className="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all cursor-pointer"
+                      className="p-2 text-charcoal dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all cursor-pointer"
                       title={t("nav.profile")}
                     >
                       <AccountCircleIcon className="w-6 h-6" />
                     </Link>
                     <button
-                      className="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all relative cursor-pointer"
+                      className="p-2 text-charcoal dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all relative cursor-pointer"
                       title={t("nav.notifications")}
                     >
                       <NotificationsIcon className="w-6 h-6" />
@@ -351,7 +351,7 @@ const Header = () => {
               <div className="flex items-center gap-1">
                 <button
                   onClick={toggleTheme}
-                  className="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all cursor-pointer"
+                  className="p-2 text-charcoal dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all cursor-pointer"
                   aria-label="Toggle theme"
                 >
                   {isDark ? (
@@ -362,7 +362,7 @@ const Header = () => {
                 </button>
                 <button
                   onClick={toggleLanguage}
-                  className="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all cursor-pointer"
+                  className="p-2 text-charcoal dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all cursor-pointer"
                   aria-label="Toggle language"
                 >
                   <div className="flex items-center gap-1">
@@ -377,7 +377,7 @@ const Header = () => {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all cursor-pointer"
+                className="lg:hidden p-2 text-charcoal dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all cursor-pointer"
                 aria-label="Toggle menu"
               >
                 {isMobileMenuOpen ? (
@@ -402,8 +402,8 @@ const Header = () => {
                 className={`px-4 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer ${
                   (link.path && location.pathname === link.path) ||
                   activeSection === link.section
-                    ? "bg-primary dark:bg-secondary text-white shadow-md"
-                    : "text-gray-700 dark:text-gray-300 hover:bg-secondary/20 dark:hover:bg-secondary/20 hover:text-secondary-dark dark:hover:text-secondary"
+                    ? "bg-primary dark:bg-accent text-light shadow-md"
+                    : "text-charcoal dark:text-gray-300 hover:bg-accent/20 dark:hover:bg-accent/20 hover:text-accent dark:hover:text-accent-secondary"
                 }`}
               >
                 {link.label}

@@ -11,6 +11,7 @@ import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 
 const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
   const { t } = useTranslation();
@@ -426,14 +427,14 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
 
       {/* Modal */}
       <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto animate-scale-in">
+        <div className="bg-light dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto animate-scale-in">
           {/* Header */}
-          <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
+          <div className="sticky top-0 bg-light dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-2xl font-bold text-primary dark:text-light">
                 {isLogin ? t("auth.login.title") : t("auth.register.title")}
               </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-sm text-charcoal dark:text-gray-400 mt-1">
                 {isLogin
                   ? t("auth.login.subtitle")
                   : t("auth.register.subtitle")}
@@ -441,7 +442,7 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
             </div>
             <button
               onClick={onClose}
-              className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all"
+              className="p-2 text-charcoal hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all cursor-pointer"
             >
               <CloseIcon className="w-6 h-6" />
             </button>
@@ -449,15 +450,15 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
 
           {/* Progress Steps (Register Only) */}
           {!isLogin && step < 3 && (
-            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50">
+            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900">
               <div className="flex items-center justify-between">
                 {[1, 2].map((stepNum) => (
                   <div key={stepNum} className="flex items-center flex-1">
                     <div
                       className={`flex items-center justify-center w-8 h-8 rounded-full font-bold ${
                         step >= stepNum
-                          ? "bg-primary dark:bg-secondary text-white"
-                          : "bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                          ? "bg-primary dark:bg-accent text-white"
+                          : "bg-gray-300 dark:bg-gray-700 text-charcoal dark:text-gray-400"
                       }`}
                     >
                       {stepNum}
@@ -466,7 +467,7 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                       <div
                         className={`flex-1 h-1 mx-2 ${
                           step > stepNum
-                            ? "bg-primary dark:bg-secondary"
+                            ? "bg-primary dark:bg-accent"
                             : "bg-gray-300 dark:bg-gray-700"
                         }`}
                       />
@@ -474,7 +475,7 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                   </div>
                 ))}
               </div>
-              <div className="flex justify-between mt-2 text-xs text-gray-600 dark:text-gray-400">
+              <div className="flex justify-between mt-2 text-xs text-charcoal dark:text-gray-400">
                 <span>{t("auth.steps.step1")}</span>
                 <span>{t("auth.steps.step2")}</span>
               </div>
@@ -488,20 +489,20 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                 {/* Login Method Selection */}
                 {isLogin && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-charcoal dark:text-gray-300 mb-2">
                       {t("auth.loginMethod.title")}
                     </label>
                     <div className="grid grid-cols-2 gap-3">
                       <button
                         type="button"
                         onClick={() => setLoginMethod("whatsapp")}
-                        className={`flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 transition-all ${
+                        className={`flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 transition-all cursor-pointer ${
                           loginMethod === "whatsapp"
-                            ? "border-primary bg-primary/10 text-primary dark:border-secondary dark:bg-secondary/10 dark:text-secondary"
-                            : "border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-400"
+                            ? "border-accent bg-accent/10 text-accent dark:border-accent dark:bg-accent/20 dark:text-accent"
+                            : "border-gray-300 dark:border-gray-600 text-charcoal dark:text-gray-400 hover:border-accent/50"
                         }`}
                       >
-                        <PhoneIcon className="w-5 h-5" />
+                        <WhatsAppIcon className="w-5 h-5" />
                         <span className="font-medium">
                           {t("auth.loginMethod.whatsapp")}
                         </span>
@@ -509,10 +510,10 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                       <button
                         type="button"
                         onClick={() => setLoginMethod("email")}
-                        className={`flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 transition-all ${
+                        className={`flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 transition-all cursor-pointer ${
                           loginMethod === "email"
-                            ? "border-primary bg-primary/10 text-primary dark:border-secondary dark:bg-secondary/10 dark:text-secondary"
-                            : "border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-400"
+                            ? "border-accent bg-accent/10 text-accent dark:border-accent dark:bg-accent/20 dark:text-accent"
+                            : "border-gray-300 dark:border-gray-600 text-charcoal dark:text-gray-400 hover:border-accent/50"
                         }`}
                       >
                         <EmailIcon className="w-5 h-5" />
@@ -537,7 +538,7 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                             value={formData.firstName}
                             onChange={handleChange}
                             placeholder={t("auth.fields.firstName")}
-                            className="w-full pl-10 rtl:pl-4 rtl:pr-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-primary dark:focus:ring-secondary focus:border-transparent transition-colors"
+                            className="w-full pl-10 rtl:pl-4 rtl:pr-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-primary dark:text-light placeholder:text-charcoal dark:placeholder:text-gray-400 focus:ring-2 focus:ring-accent dark:focus:ring-accent focus:border-transparent transition-colors"
                             required
                           />
                         </div>
@@ -551,7 +552,7 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                             value={formData.lastName}
                             onChange={handleChange}
                             placeholder={t("auth.fields.lastName")}
-                            className="w-full pl-10 rtl:pl-4 rtl:pr-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-primary dark:focus:ring-secondary focus:border-transparent transition-colors"
+                            className="w-full pl-10 rtl:pl-4 rtl:pr-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-primary dark:text-light placeholder:text-charcoal dark:placeholder:text-gray-400 focus:ring-2 focus:ring-accent dark:focus:ring-accent focus:border-transparent transition-colors"
                             required
                           />
                         </div>
@@ -567,7 +568,7 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                           value={formData.email}
                           onChange={handleChange}
                           placeholder={t("auth.fields.email")}
-                          className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-primary dark:focus:ring-secondary focus:border-transparent transition-colors"
+                          className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-primary dark:text-light placeholder:text-charcoal dark:placeholder:text-gray-400 focus:ring-2 focus:ring-accent dark:focus:ring-accent focus:border-transparent transition-colors"
                           required
                         />
                       </div>
@@ -577,7 +578,7 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                       <div className="relative" dir="ltr">
                         <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center">
                           <PhoneIcon className="w-5 h-5 text-gray-400" />
-                          <span className="ml-2 text-gray-600 dark:text-gray-400">
+                          <span className="ml-2 text-charcoal dark:text-gray-400">
                             +966
                           </span>
                         </div>
@@ -587,12 +588,12 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                           value={formData.phone}
                           onChange={handleChange}
                           placeholder="5xxxxxxxx"
-                          className="w-full pl-[5.5rem] pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-primary dark:focus:ring-secondary focus:border-transparent transition-colors"
+                          className="w-full pl-[5.5rem] pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-primary dark:text-light placeholder:text-charcoal dark:placeholder:text-gray-400 focus:ring-2 focus:ring-accent dark:focus:ring-accent focus:border-transparent transition-colors"
                           maxLength="9"
                           required
                         />
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      <p className="text-xs text-charcoal dark:text-gray-400 mt-1">
                         {t("auth.fields.phoneHint")}
                       </p>
                     </div>
@@ -609,7 +610,7 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                           name="specialty"
                           value={formData.specialty}
                           onChange={handleChange}
-                          className="w-full pl-10 rtl:pl-4 rtl:pr-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-secondary focus:border-transparent transition-colors appearance-none"
+                          className="w-full pl-10 rtl:pl-4 rtl:pr-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-primary dark:text-light focus:ring-2 focus:ring-accent dark:focus:ring-accent focus:border-transparent transition-colors appearance-none"
                           required
                         >
                           <option value="">{t("auth.fields.specialty")}</option>
@@ -630,7 +631,7 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                           value={formData.specialtyOther}
                           onChange={handleChange}
                           placeholder={t("auth.fields.specialtyOther")}
-                          className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-primary dark:focus:ring-secondary focus:border-transparent transition-colors"
+                          className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-primary dark:text-light placeholder:text-charcoal dark:placeholder:text-gray-400 focus:ring-2 focus:ring-accent dark:focus:ring-accent focus:border-transparent transition-colors"
                           required
                         />
                       </div>
@@ -645,14 +646,14 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                           value={formData.clinicName}
                           onChange={handleChange}
                           placeholder={t("auth.fields.clinicName")}
-                          className="w-full pl-10 rtl:pl-4 rtl:pr-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-primary dark:focus:ring-secondary focus:border-transparent transition-colors"
+                          className="w-full pl-10 rtl:pl-4 rtl:pr-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-primary dark:text-light placeholder:text-charcoal dark:placeholder:text-gray-400 focus:ring-2 focus:ring-accent dark:focus:ring-accent focus:border-transparent transition-colors"
                           required
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-charcoal dark:text-gray-300 mb-2">
                         {t("auth.otpChannel.title")}
                       </label>
                       <div className="grid grid-cols-2 gap-3">
@@ -661,11 +662,11 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                           onClick={() => setOtpChannel("whatsapp")}
                           className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border-2 transition-all cursor-pointer ${
                             otpChannel === "whatsapp"
-                              ? "border-primary bg-primary/10 text-primary dark:border-secondary dark:bg-secondary/10 dark:text-secondary"
-                              : "border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-400"
+                              ? "border-accent bg-accent/10 text-accent dark:border-accent dark:bg-accent/20 dark:text-accent"
+                              : "border-gray-300 dark:border-gray-600 text-charcoal dark:text-gray-400 hover:border-accent/50"
                           }`}
                         >
-                          <PhoneIcon className="w-5 h-5" />
+                          <WhatsAppIcon className="w-5 h-5" />
                           <span className="font-medium">WhatsApp</span>
                         </button>
                         <button
@@ -673,8 +674,8 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                           onClick={() => setOtpChannel("email")}
                           className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border-2 transition-all cursor-pointer ${
                             otpChannel === "email"
-                              ? "border-primary bg-primary/10 text-primary dark:border-secondary dark:bg-secondary/10 dark:text-secondary"
-                              : "border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-400"
+                              ? "border-accent bg-accent/10 text-accent dark:border-accent dark:bg-accent/20 dark:text-accent"
+                              : "border-gray-300 dark:border-gray-600 text-charcoal dark:text-gray-400 hover:border-accent/50"
                           }`}
                         >
                           <EmailIcon className="w-5 h-5" />
@@ -683,7 +684,7 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                           </span>
                         </button>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      <p className="text-xs text-charcoal dark:text-gray-400 mt-1">
                         {t("auth.otpChannel.hint")}
                       </p>
                     </div>
@@ -703,7 +704,7 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                             value={formData.email}
                             onChange={handleChange}
                             placeholder={t("auth.fields.email")}
-                            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-primary dark:focus:ring-secondary focus:border-transparent transition-colors"
+                            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-primary dark:text-light placeholder:text-charcoal dark:placeholder:text-gray-400 focus:ring-2 focus:ring-accent dark:focus:ring-accent focus:border-transparent transition-colors"
                             required
                           />
                         </>
@@ -711,7 +712,7 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                         <>
                           <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center">
                             <PhoneIcon className="w-5 h-5 text-gray-400" />
-                            <span className="ml-2 text-gray-600 dark:text-gray-400">
+                            <span className="ml-2 text-charcoal dark:text-gray-400">
                               +966
                             </span>
                           </div>
@@ -721,7 +722,7 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                             value={formData.phone}
                             onChange={handleChange}
                             placeholder="5xxxxxxxx"
-                            className="w-full pl-[5.5rem] pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-primary dark:focus:ring-secondary focus:border-transparent transition-colors"
+                            className="w-full pl-[5.5rem] pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-primary dark:text-light placeholder:text-charcoal dark:placeholder:text-gray-400 focus:ring-2 focus:ring-accent dark:focus:ring-accent focus:border-transparent transition-colors"
                             maxLength="9"
                             required
                           />
@@ -756,7 +757,7 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                     <button
                       type="button"
                       onClick={handleBack}
-                      className="flex items-center justify-center gap-2 px-6 py-2.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-all cursor-pointer"
+                      className="flex items-center justify-center gap-2 px-6 py-2.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-charcoal dark:text-gray-300 rounded-lg font-medium transition-all cursor-pointer"
                     >
                       <ArrowIcon className="w-5 h-5" />
                       <span>{t("auth.buttons.back")}</span>
@@ -799,15 +800,15 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                 </div>
 
                 {/* Switch Type */}
-                <div className="text-center pt-3 border-t border-gray-200 dark:border-gray-800">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-center pt-3 border-t border-gray-200 dark:border-gray-700">
+                  <p className="text-sm text-charcoal dark:text-gray-400">
                     {isLogin
                       ? t("auth.login.noAccount")
                       : t("auth.register.hasAccount")}{" "}
                     <button
                       type="button"
                       onClick={handleSwitchType}
-                      className="text-primary dark:text-secondary font-medium hover:underline cursor-pointer"
+                      className="text-accent dark:text-accent-secondary font-medium hover:underline cursor-pointer"
                     >
                       {isLogin
                         ? t("auth.login.registerLink")
@@ -851,7 +852,7 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                     name="otp"
                     value={formData.otp}
                     onChange={handleChange}
-                    className="w-full px-4 py-4 text-center text-2xl tracking-[0.5em] font-bold border-2 border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-secondary focus:border-transparent transition-colors"
+                    className="w-full px-4 py-4 text-center text-2xl tracking-[0.5em] font-bold border-2 border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-primary dark:text-light focus:ring-2 focus:ring-accent dark:focus:ring-accent focus:border-transparent transition-colors"
                     placeholder="● ● ● ● ● ●"
                     maxLength="6"
                     inputMode="numeric"
@@ -864,9 +865,9 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                 {/* Resend OTP */}
                 <div className="text-center">
                   {countdown > 0 ? (
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-charcoal dark:text-gray-400">
                       {t("auth.otp.resendIn")}{" "}
-                      <span className="font-bold text-primary dark:text-secondary">
+                      <span className="font-bold text-accent dark:text-accent-secondary">
                         {countdown}
                       </span>{" "}
                       {t("auth.otp.seconds")}
@@ -876,7 +877,7 @@ const AuthModal = ({ isOpen, onClose, type, onSwitchType, onSuccess }) => {
                       type="button"
                       onClick={handleResendOTP}
                       disabled={loading}
-                      className="text-sm text-primary dark:text-secondary font-medium hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="text-sm text-accent dark:text-accent-secondary font-medium hover:underline disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
                       {t("auth.otp.resend")}
                     </button>

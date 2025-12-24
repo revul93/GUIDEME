@@ -5,15 +5,15 @@
    ======================================== */
 
 @theme {
-  /* Colors */
-  --color-primary: #1c3f60;
-  --color-primary-dark: #152e47;
-  --color-primary-light: #2a5a8a;
-  --color-secondary: #4caf6e;
-  --color-secondary-dark: #3d8c57;
-  --color-secondary-light: #6bc088;
+  /* Brand Colors - Updated Palette */
+  --color-primary: #02172b;
   --color-light: #fffbf5;
-  --color-dark: #1b2228;
+  --color-accent: #4caf6e;
+  --color-accent-secondary: #2baeba;
+  --color-charcoal: #2e2e2e;
+
+  /* Dark mode variants */
+  --color-dark: #02172b;
 
   /* Fonts */
   --font-family-sans: Inter, Cairo, system-ui, sans-serif;
@@ -25,11 +25,8 @@
   /* Animations */
   --animate-fade-in-up: fade-in-up 0.8s ease-out forwards;
   --animate-fade-in: fade-in 0.6s ease-out forwards;
-  --animate-slide-in-left: slide-in-left 0.8s ease-out forwards;
-  --animate-slide-in-right: slide-in-right 0.8s ease-out forwards;
+  --animate-slide-in: slide-in 0.6s ease-out forwards;
   --animate-scale-in: scale-in 0.6s ease-out forwards;
-  --animate-float: float 3s ease-in-out infinite;
-  --animate-pulse-slow: pulse 3s ease-in-out infinite;
 }
 
 /* Enable dark mode variant */
@@ -59,21 +56,10 @@
   }
 }
 
-@keyframes slide-in-left {
+@keyframes slide-in {
   0% {
     opacity: 0;
-    transform: translateX(-30px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slide-in-right {
-  0% {
-    opacity: 0;
-    transform: translateX(30px);
+    transform: translateX(-20px);
   }
   100% {
     opacity: 1;
@@ -89,54 +75,6 @@
   100% {
     opacity: 1;
     transform: scale(1);
-  }
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
-
-@keyframes pulse-slow {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
-}
-
-@keyframes bounce-subtle {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes rotate-slow {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
   }
 }
 
@@ -204,7 +142,7 @@ html {
    ======================================== */
 
 body {
-  @apply bg-light dark:bg-dark text-gray-900 dark:text-white;
+  @apply bg-light dark:bg-dark text-charcoal dark:text-light;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -213,7 +151,7 @@ body {
 }
 
 *:focus-visible {
-  @apply outline-2 outline-offset-2 outline-primary dark:outline-secondary;
+  @apply outline-2 outline-offset-2 outline-accent dark:outline-accent-secondary;
 }
 
 /* ========================================
@@ -229,12 +167,8 @@ body {
     animation: fade-in 0.6s ease-out forwards;
   }
 
-  .animate-slide-in-left {
-    animation: slide-in-left 0.8s ease-out forwards;
-  }
-
-  .animate-slide-in-right {
-    animation: slide-in-right 0.8s ease-out forwards;
+  .animate-slide-in {
+    animation: slide-in 0.6s ease-out forwards;
   }
 
   .animate-scale-in {
@@ -271,22 +205,6 @@ body {
   .delay-1000 {
     animation-delay: 1s;
   }
-
-  .transition-transform-smooth {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .hover-scale:hover {
-    transform: scale(1.05);
-  }
-
-  .hover-lift:hover {
-    transform: translateY(-8px);
-  }
-
-  .transition-shadow-smooth {
-    transition: box-shadow 0.3s ease-in-out;
-  }
 }
 
 /* ========================================
@@ -303,63 +221,10 @@ body {
 }
 
 /* ========================================
-   BUTTON HOVER EFFECTS
+   BUTTON STYLES
    ======================================== */
 button {
   cursor: pointer;
-}
-
-.btn-hover-lift {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.btn-hover-lift:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
-    0 8px 10px -6px rgba(0, 0, 0, 0.1);
-}
-
-.btn-hover-scale {
-  transition: transform 0.3s ease;
-}
-
-.btn-hover-scale:hover {
-  transform: scale(1.05);
-}
-
-/* ========================================
-   CARD HOVER EFFECTS
-   ======================================== */
-
-.card-hover {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card-hover:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-/* ========================================
-   GRADIENT ANIMATIONS
-   ======================================== */
-
-.gradient-animate {
-  background-size: 200% 200%;
-  animation: gradient-shift 8s ease infinite;
-}
-
-@keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
 }
 
 /* ========================================
@@ -367,11 +232,19 @@ button {
    ======================================== */
 
 ::selection {
-  @apply bg-primary/20 dark:bg-secondary/20 text-gray-900 dark:text-white;
+  @apply bg-accent/20 text-primary;
 }
 
 ::-moz-selection {
-  @apply bg-primary/20 dark:bg-secondary/20 text-gray-900 dark:text-white;
+  @apply bg-accent/20 text-primary;
+}
+
+.dark ::selection {
+  @apply bg-accent-secondary/20 text-light;
+}
+
+.dark ::-moz-selection {
+  @apply bg-accent-secondary/20 text-light;
 }
 
 /* ========================================
@@ -380,17 +253,6 @@ button {
 
 .skeleton {
   @apply animate-pulse bg-gray-200 dark:bg-gray-700 rounded;
-}
-
-.shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
 }
 
 /* ========================================
@@ -411,7 +273,7 @@ button {
    ======================================== */
 
 .skip-link {
-  @apply absolute -top-full left-0 bg-primary text-white px-4 py-2 rounded;
+  @apply absolute -top-full left-0 bg-primary text-light px-4 py-2 rounded;
   transition: top 0.3s;
 }
 
@@ -436,7 +298,7 @@ button {
 
 @media print {
   body {
-    @apply bg-white text-black;
+    @apply bg-light text-charcoal;
   }
 
   .no-print {
@@ -449,18 +311,6 @@ button {
 }
 
 /* ========================================
-   RTL SUPPORT ENHANCEMENTS
-   ======================================== */
-
-[dir="rtl"] .slide-in-left {
-  animation: slide-in-right 0.8s ease-out forwards;
-}
-
-[dir="rtl"] .slide-in-right {
-  animation: slide-in-left 0.8s ease-out forwards;
-}
-
-/* ========================================
    DARK MODE TRANSITIONS
    ======================================== */
 
@@ -469,74 +319,16 @@ button {
     border-color 0.3s ease;
 }
 
-::selection {
-  background-color: #3b82f6;
-  color: #ffffff;
-}
-
-.dark ::selection {
-  background-color: #60a5fa;
-  color: #000000;
-}
-
 input::selection,
 textarea::selection,
 select::selection {
-  background-color: #3b82f6;
-  color: #ffffff;
+  background-color: #4caf6e;
+  color: #02172b;
 }
 
 .dark input::selection,
 .dark textarea::selection,
 .dark select::selection {
-  background-color: #60a5fa;
-  color: #000000;
-}
-
-/* ========================================
-   UTILITY CLASSES
-   ======================================== */
-
-.glass {
-  @apply bg-white/10 dark:bg-gray-900/10 backdrop-blur-md border border-white/20 dark:border-gray-800/20;
-}
-
-.glow {
-  box-shadow: 0 0 20px rgba(76, 175, 110, 0.3);
-}
-
-.dark .glow {
-  box-shadow: 0 0 20px rgba(76, 175, 110, 0.5);
-}
-
-.gradient-text {
-  @apply bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
-}
-
-.gradient-border {
-  position: relative;
-  background: white;
-  border-radius: 1rem;
-}
-
-.dark .gradient-border {
-  background: #1b2228;
-}
-
-.gradient-border::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 1rem;
-  padding: 2px;
-  background: linear-gradient(135deg, #1c3f60, #4caf6e);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-}
-
-.gradient-border > .content {
-  position: relative;
-  border-radius: 1rem;
-  padding: 1rem;
+  background-color: #2baeba;
+  color: #fffbf5;
 }

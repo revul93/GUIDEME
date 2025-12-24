@@ -68,13 +68,34 @@
   "values": {
     "title": "Our Values",
     "subtitle": "The principles that guide everything we do",
+    "missionVisionTitle": "Our Mission & Vision",
     "mission": {
-      "title": "Our Mission",
-      "description": "To empower dentists and dental labs with reliable digital planning, precise surgical guides, and a seamless case-submission experience—delivering clarity and confidence in every treatment."
+      "title": "Mission",
+      "description": "To empower dentists and dental labs with reliable digital planning, precise surgical guides, and a seamless case-submission experience—delivering clarity and confidence in every treatment"
     },
     "vision": {
-      "title": "Our Vision",
+      "title": "Vision",
       "description": "To become the trusted digital partner for clinicians worldwide—where every dental implant treatment begins with structured diagnostics, guided workflows, and uncompromising precision."
+    },
+    "precision": {
+      "title": "Precision",
+      "description": "Every step, every design, every surgical guide... built on a calculated methodology."
+    },
+    "transparency": {
+      "title": "Transparency",
+      "description": "Clear information, clear plan, clear communication, clear prices."
+    },
+    "reliability": {
+      "title": "Clinical Reliability",
+      "description": "What is delivered to the doctor is clinically applicable without surprises."
+    },
+    "innovation": {
+      "title": "Innovation",
+      "description": "Advanced technology, continuous improvement, and constant development of the user journey."
+    },
+    "partnership": {
+      "title": "Partnership",
+      "description": "We see ourselves as part of the doctor's team, not just a service provider."
     }
   },
   "services": {
@@ -261,23 +282,42 @@
     }
   },
   "dashboard": {
-    "cases": {
+    "myCases": {
       "title": "My Cases",
-      "filters": {
-        "all": "All Cases",
-        "draft": "Draft",
-        "ready": "Ready",
-        "submitted": "Submitted",
-        "inProduction": "In Production",
-        "awaitingAction": "Awaiting Action",
-        "completed": "Completed",
-        "cancelled": "Cancelled"
-      },
-      "searchPlaceholder": "Search cases by patient name or ID...",
-      "noSearchResults": "No cases match your search",
-      "noCases": "No cases found",
-      "noCasesDescription": "You have not submitted any cases yet.  Submit your first case now",
-      "submitCase": "Submit Case"
+      "subtitle": "Manage and track all your dental case submissions"
+    },
+    "stats": {
+      "total": "Total Cases",
+      "pending": "Pending",
+      "active": "Active",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "filters": {
+      "search": "Search",
+      "searchPlaceholder": "Search by case number...",
+      "status": "Status",
+      "allStatuses": "All Statuses",
+      "category": "Procedure Category",
+      "allCategories": "All Categories"
+    },
+    "table": {
+      "caseNumber": "Case Number",
+      "category": "Procedure Category",
+      "status": "Status",
+      "submitted": "Submitted",
+      "updated": "Last Updated",
+      "actions": "Actions",
+      "view": "View Details"
+    },
+    "empty": {
+      "title": "No cases found",
+      "description": "Get started by creating your first case",
+      "createCase": "Create New Case"
     }
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next"
   }
 }

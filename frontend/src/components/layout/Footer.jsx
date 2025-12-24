@@ -29,24 +29,24 @@ const Footer = () => {
           {/* Left: Logo + Contact */}
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 md:gap-4">
             <img
-              src={isDark ? "/logo-inversed.png" : "/logo.png"}
+              src={isDark ? "/brand.svg" : "/brand.svg"}
               alt="GuideMe Logo"
-              className="h-6 w-auto"
+              className="h-9 w-auto"
             />
-            
+
             <div className="hidden md:block h-4 w-px bg-gray-300 dark:bg-gray-700"></div>
-            
+
             <a
               href="tel:+966500000000"
-              className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-secondary transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 text-sm text-charcoal dark:text-gray-400 hover:text-accent dark:hover:text-accent-secondary transition-colors cursor-pointer"
             >
               <PhoneIcon className="w-4 h-4" />
               <span dir="ltr">+966 50 000 0000</span>
             </a>
-            
+
             <a
               href="mailto:info@guideme.sa"
-              className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-secondary transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 text-sm text-charcoal dark:text-gray-400 hover:text-accent dark:hover:text-accent-secondary transition-colors cursor-pointer"
             >
               <EmailIcon className="w-4 h-4" />
               <span>info@guideme.sa</span>
@@ -65,7 +65,7 @@ const Footer = () => {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-secondary transition-colors cursor-pointer"
+                    className="text-charcoal dark:text-gray-400 hover:text-accent dark:hover:text-accent-secondary transition-colors cursor-pointer"
                     aria-label={social.label}
                   >
                     <Icon className="w-4 h-4" />
@@ -77,17 +77,17 @@ const Footer = () => {
             <div className="hidden md:block h-4 w-px bg-gray-300 dark:bg-gray-700"></div>
 
             {/* Legal Links + Copyright */}
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-2 text-sm text-charcoal dark:text-gray-400">
               <Link
                 to="/terms"
-                className="hover:text-primary dark:hover:text-secondary transition-colors cursor-pointer"
+                className="hover:text-accent dark:hover:text-accent-secondary transition-colors cursor-pointer"
               >
                 Terms
               </Link>
               <span>•</span>
               <Link
                 to="/privacy"
-                className="hover:text-primary dark:hover:text-secondary transition-colors cursor-pointer"
+                className="hover:text-accent dark:hover:text-accent-secondary transition-colors cursor-pointer"
               >
                 Privacy
               </Link>
