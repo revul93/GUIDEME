@@ -68,7 +68,7 @@ const MobileMenu = ({
         {/* Header */}
         <div className="flex-shrink-0 flex items-center justify-between px-4 h-16 border-b border-gray-200 dark:border-gray-800">
           <img
-            src={isDark ? "/logo-inversed.png" : "/logo.png"}
+            src={isDark ? "/brand.svg" : "/brand.svg"}
             alt="GuideMe Logo"
             className="h-8 w-auto object-contain"
           />
@@ -90,7 +90,7 @@ const MobileMenu = ({
                   <AccountCircleIcon className="w-12 h-12 text-primary dark:text-accent" />
                   <div>
                     <p className="font-semibold text-primary dark:text-light">
-                      {user.firstName} {user.lastName}
+                      {user.name}
                     </p>
                     <p className="text-sm text-charcoal dark:text-gray-400">
                       {user.email}

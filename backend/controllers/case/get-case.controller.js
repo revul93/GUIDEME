@@ -3,20 +3,17 @@ import logger from "../../utils/logger.js";
 
 export const getCase = async (req, res) => {
   try {
-    if (req.user.role !== "client") {
-      return res.status(403).json({
-        success: false,
-        message: "Only clients can access cases",
-      });
+    const { id } = req.params;
+    const caseId = parseInt(id);
+
+    // Build where clause based on user role
+    const whereClause = { id: caseId };
+    if (req.user.role === "client") {
+      whereClause.clientProfileId = req.user.profile.id;
     }
 
-    const { id } = req.params;
-
     const caseData = await prisma.case.findFirst({
-      where: {
-        id: parseInt(id),
-        clientProfileId: req.user.profile.id,
-      },
+      where: whereClause,
       include: {
         clientProfile: {
           select: {
@@ -28,48 +25,6 @@ export const getCase = async (req, res) => {
         files: {
           orderBy: { createdAt: "desc" },
         },
-        comments: {
-          include: {
-            clientProfile: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-            designerProfile: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-          orderBy: { createdAt: "asc" },
-        },
-        statusHistory: {
-          include: {
-            designerProfile: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-          orderBy: { createdAt: "desc" },
-        },
-        quotes: {
-          orderBy: { createdAt: "desc" },
-        },
-        payments: {
-          orderBy: { createdAt: "desc" },
-        },
-        deliveryAddress: true,
-        pickupBranch: true,
-        studyCompletedBy: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
       },
     });
 
@@ -80,25 +35,14 @@ export const getCase = async (req, res) => {
       });
     }
 
-    if (caseData.teethNumbers) {
-      try {
-        caseData.teethNumbers = JSON.parse(caseData.teethNumbers);
-      } catch (error) {
-        logger.error("Controller error:", {
-          error: "Failed to parse teethNumbers",
-          stack: error.stack,
-          controller: "getCase.teethparsing",
-          userId: req.user?.id,
-          caseId: req.params?.id,
-        });
-      }
-    }
+    logger.info("Case retrieved successfully", {
+      caseId: caseData.id,
+      userId: req.user.id,
+    });
 
-    res.status(200).json({
+    res.json({
       success: true,
-      data: {
-        case: caseData,
-      },
+      data: { case: caseData },
     });
   } catch (error) {
     logger.error("Controller error:", {
@@ -108,9 +52,10 @@ export const getCase = async (req, res) => {
       userId: req.user?.id,
       caseId: req.params?.id,
     });
+
     return res.status(500).json({
       success: false,
-      message: "Retriving case failed",
+      message: "Failed to fetch case",
     });
   }
 };

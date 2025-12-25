@@ -1,9 +1,10 @@
 import prisma from "../../config/db.js";
-import { validateCaseData } from "./validation.js";
 import logger from "../../utils/logger.js";
+import { validateCaseData } from "./validation.js";
 
 export const createCase = async (req, res) => {
   try {
+    // Ensure user is a client
     if (req.user.role !== "client") {
       return res.status(403).json({
         success: false,
@@ -11,31 +12,10 @@ export const createCase = async (req, res) => {
       });
     }
 
-    const {
-      patientId,
-      patientName,
-      patientAge,
-      patientGender,
-      procedureCategory,
-      guideType,
-      requiredService,
-      implantSystem,
-      implantSystemOther,
-      teethNumbers,
-      clinicalNotes,
-      specialInstructions,
-      isDraft,
-    } = req.body;
+    const clientProfileId = req.user.profile.id;
 
-    const validation = validateCaseData({
-      procedureCategory,
-      guideType,
-      requiredService,
-      implantSystem,
-      implantSystemOther,
-      isDraft,
-    });
-
+    // Validate input
+    const validation = validateCaseData(req.body);
     if (!validation.valid) {
       return res.status(400).json({
         success: false,
@@ -44,30 +24,42 @@ export const createCase = async (req, res) => {
       });
     }
 
-    const caseNumber = `CASE-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-
-    const caseData = {
-      clientProfileId: req.user.profile.id,
-      caseNumber,
-      patientId,
-      patientName,
-      patientAge,
-      patientGender,
+    const {
+      patientRef,
       procedureCategory,
       guideType,
       requiredService,
       implantSystem,
-      implantSystemOther,
-      teethNumbers: teethNumbers ? JSON.stringify(teethNumbers) : null,
+      teethNumbers,
       clinicalNotes,
-      specialInstructions,
-      status: isDraft ? "draft" : "submitted",
-      isDraft: isDraft !== false,
-      submittedAt: isDraft ? null : new Date(),
-    };
+      deliveryMethod,
+      deliveryAddressId,
+      pickupBranchId,
+    } = req.body;
 
+    // Generate unique case number
+    const timestamp = Date.now();
+    const random = Math.floor(Math.random() * 1000);
+    const caseNumber = `CASE-${timestamp}-${random}`;
+
+    // Create case
     const newCase = await prisma.case.create({
-      data: caseData,
+      data: {
+        clientProfileId,
+        caseNumber,
+        patientRef: patientRef || null,
+        procedureCategory,
+        guideType,
+        requiredService,
+        implantSystem: implantSystem || null,
+        teethNumbers: teethNumbers || null,
+        clinicalNotes: clinicalNotes || null,
+        deliveryMethod: deliveryMethod || null,
+        deliveryAddressId: deliveryAddressId || null,
+        pickupBranchId: pickupBranchId || null,
+        status: "submitted",
+        submittedAt: new Date(),
+      },
       include: {
         clientProfile: {
           select: {
@@ -79,22 +71,26 @@ export const createCase = async (req, res) => {
       },
     });
 
-    if (!isDraft) {
-      await prisma.caseStatusHistory.create({
-        data: {
-          caseId: newCase.id,
-          fromStatus: null,
-          toStatus: "submitted",
-          changedBy: "client",
-          changedById: null,
-          notes: "Case submitted",
-        },
-      });
-    }
+    // Create initial status history
+    await prisma.caseStatusHistory.create({
+      data: {
+        caseId: newCase.id,
+        toStatus: "submitted",
+        notes: "Case submitted by client",
+        changedByClientId: clientProfileId, // Use client profile ID
+        changedBy: "doctor",
+      },
+    });
+
+    logger.info("Case created successfully", {
+      caseId: newCase.id,
+      caseNumber: newCase.caseNumber,
+      userId: req.user.id,
+    });
 
     res.status(201).json({
       success: true,
-      message: isDraft ? "Case saved as draft" : "Case submitted successfully",
+      message: "Case created successfully",
       data: {
         case: newCase,
       },
@@ -105,8 +101,8 @@ export const createCase = async (req, res) => {
       stack: error.stack,
       controller: "createCase",
       userId: req.user?.id,
-      caseId: req.params?.id,
     });
+
     return res.status(500).json({
       success: false,
       message: "Failed to create case",

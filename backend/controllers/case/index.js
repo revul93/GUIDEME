@@ -1,6 +1,10 @@
-export { createCase } from "./create-case.controller.js";
 export { listCases } from "./list-cases.controller.js";
-export { getCase } from "./get-case.controller.js";
 export { updateCase } from "./update-case.controller.js";
 export { submitCase } from "./submit-case.controller.js";
+export { getCase } from "./get-case.controller.js";
+export { getCases } from "./get-cases.controller.js";
+export { getCaseStatusHistory } from "./get-status-history.controller.js";
+export { getCaseComments } from "./get-comments.controller.js";
+export { createCaseComment } from "./create-comment.controller.js";
 export { getCaseStats } from "./stats.controller.js";
+export { createCase } from "./create-case.controller.js";

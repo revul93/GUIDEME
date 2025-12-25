@@ -229,6 +229,7 @@ model ClientProfile {
   updatedAt DateTime @updatedAt
 
   // Relations
+  caseStatusUpdates CaseStatusHistory[]
   addresses    Address[]
   cases        Case[]
   caseComments CaseComment[]
@@ -475,10 +476,14 @@ model CaseStatusHistory {
   fromStatus CaseStatus?
   toStatus   CaseStatus
 
-  // Track who changed it
-  changedBy       String // "client", "designer", "system"
-  changedById     Int? // profileId
-  designerProfile DesignerProfile? @relation(fields: [changedById], references: [id])
+  // Separate fields for client vs designer changes
+  changedByClientId    Int?
+  changedByDesignerId  Int?
+  changedBy            String  // "client", "designer", "admin", "system"
+  
+  // Relations - one will be set based on who made the change
+  client   ClientProfile?   @relation(fields: [changedByClientId], references: [id])
+  designer DesignerProfile? @relation(fields: [changedByDesignerId], references: [id])
 
   notes String?
 

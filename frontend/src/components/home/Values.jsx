@@ -49,10 +49,10 @@ const Values = () => {
               key={index}
               className="bg-light dark:bg-gray-800 rounded-xl p-6 border border-accent/30 dark:border-accent-secondary/30 hover:border-accent dark:hover:border-accent-secondary hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
             >
-              <h3 className="text-lg font-bold text-accent dark:text-accent-secondary mb-3">
+              <h3 className="text-center text-lg font-bold text-accent dark:text-accent-secondary mb-3">
                 {value.title}
               </h3>
-              <p className="text-sm text-charcoal dark:text-gray-300 leading-relaxed">
+              <p className="text-center text-sm text-charcoal dark:text-gray-300 leading-relaxed">
                 {value.description}
               </p>
             </div>
@@ -67,7 +67,7 @@ const Values = () => {
         {/* Mission & Vision Section */}
         <div className="max-w-6xl mx-auto animate-fade-in delay-200">
           {/* Title */}
-          <h3 className="text-xl sm:text-2xl font-bold text-primary dark:text-light text-center mb-6">
+          <h3 className="text-center text-xl sm:text-2xl font-bold text-primary dark:text-light text-center mb-6">
             {t("values.missionVisionTitle")}
           </h3>
 

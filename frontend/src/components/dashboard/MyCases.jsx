@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
+import api from "../../utils/api"; // Use our configured axios instance
 
 const MyCases = () => {
   const { t } = useTranslation();
-  
+
   const [stats, setStats] = useState(null);
-  const [cases, setCases] = useState([]);
+  const [allCases, setAllCases] = useState([]); // Cache all cases
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  
+
   // Filters & Pagination
   const [filters, setFilters] = useState({
     status: "",
@@ -25,76 +25,234 @@ const MyCases = () => {
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState("desc");
 
-  // Fetch stats
+  // Fetch stats and ALL cases once on mount
   useEffect(() => {
-    fetchStats();
+    fetchInitialData();
   }, []);
 
-  // Fetch cases
-  useEffect(() => {
-    fetchCases();
-  }, [filters, pagination.page, pagination.limit, sortBy, sortOrder]);
+  // Filter and sort using useMemo to avoid unnecessary recalculations
+  const filteredCases = useMemo(() => {
+    let result = [...allCases];
 
-  const fetchStats = async () => {
-    try {
-      const response = await axios.get("/api/cases/stats");
-      if (response.data.success) {
-        setStats(response.data.data);
-      }
-    } catch (err) {
-      console.error("Failed to fetch stats:", err);
+    // Apply search filter
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      result = result.filter(
+        (caseItem) =>
+          caseItem.caseNumber.toLowerCase().includes(searchLower) ||
+          (caseItem.patientRef &&
+            caseItem.patientRef.toLowerCase().includes(searchLower))
+      );
     }
-  };
 
-  const fetchCases = async () => {
+    // Apply status filter
+    if (filters.status) {
+      result = result.filter((caseItem) => caseItem.status === filters.status);
+    }
+
+    // Apply procedure category filter
+    if (filters.procedureCategory) {
+      result = result.filter(
+        (caseItem) => caseItem.procedureCategory === filters.procedureCategory
+      );
+    }
+
+    // Sort results
+    result.sort((a, b) => {
+      let aValue = a[sortBy];
+      let bValue = b[sortBy];
+
+      // Handle date sorting
+      if (
+        sortBy === "createdAt" ||
+        sortBy === "submittedAt" ||
+        sortBy === "updatedAt"
+      ) {
+        aValue = new Date(aValue).getTime();
+        bValue = new Date(bValue).getTime();
+      }
+
+      // Handle string sorting
+      if (typeof aValue === "string") {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+      }
+
+      if (sortOrder === "asc") {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+    return result;
+  }, [allCases, filters, sortBy, sortOrder]);
+
+  // Calculate pagination values
+  const paginationValues = useMemo(() => {
+    return {
+      total: filteredCases.length,
+      totalPages: Math.ceil(filteredCases.length / pagination.limit),
+    };
+  }, [filteredCases.length, pagination.limit]);
+
+  // Get displayed cases for current page
+  const displayedCases = useMemo(() => {
+    const startIndex = (pagination.page - 1) * pagination.limit;
+    const endIndex = startIndex + pagination.limit;
+    return filteredCases.slice(startIndex, endIndex);
+  }, [filteredCases, pagination.page, pagination.limit]);
+
+  // Update pagination when filters change
+  useEffect(() => {
+    setPagination((prev) => ({
+      ...prev,
+      page: 1,
+      total: paginationValues.total,
+      totalPages: paginationValues.totalPages,
+    }));
+  }, [paginationValues.total, paginationValues.totalPages]);
+
+  const fetchInitialData = async () => {
     try {
       setLoading(true);
-      const params = {
-        page: pagination.page,
-        limit: pagination.limit,
-        sortBy,
-        sortOrder,
-      };
 
-      if (filters.status) params.status = filters.status;
-      if (filters.procedureCategory) params.procedureCategory = filters.procedureCategory;
+      // Fetch stats
+      const statsResponse = await api.get("/api/cases/stats");
+      if (statsResponse.data.success) {
+        setStats(statsResponse.data.data);
+      }
 
-      const response = await axios.get("/api/cases", { params });
-      
-      if (response.data.success) {
-        setCases(response.data.data.cases);
-        setPagination(response.data.data.pagination);
+      // Fetch ALL cases (no pagination, no filters)
+      const casesResponse = await api.get("/api/cases", {
+        params: {
+          page: 1,
+          limit: 1000, // Get all cases at once
+          sortBy: "createdAt",
+          sortOrder: "desc",
+        },
+      });
+
+      if (casesResponse.data.success) {
+        setAllCases(casesResponse.data.data.cases);
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch cases");
+      setError(err.response?.data?.message || "Failed to fetch data");
     } finally {
       setLoading(false);
     }
   };
 
+  const filterAndSortCases = () => {
+    let result = [...allCases];
+
+    // Apply search filter
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      result = result.filter(
+        (caseItem) =>
+          caseItem.caseNumber.toLowerCase().includes(searchLower) ||
+          (caseItem.patientRef &&
+            caseItem.patientRef.toLowerCase().includes(searchLower))
+      );
+    }
+
+    // Apply status filter
+    if (filters.status) {
+      result = result.filter((caseItem) => caseItem.status === filters.status);
+    }
+
+    // Apply procedure category filter
+    if (filters.procedureCategory) {
+      result = result.filter(
+        (caseItem) => caseItem.procedureCategory === filters.procedureCategory
+      );
+    }
+
+    // Sort results
+    result.sort((a, b) => {
+      let aValue = a[sortBy];
+      let bValue = b[sortBy];
+
+      // Handle date sorting
+      if (
+        sortBy === "createdAt" ||
+        sortBy === "submittedAt" ||
+        sortBy === "updatedAt"
+      ) {
+        aValue = new Date(aValue).getTime();
+        bValue = new Date(bValue).getTime();
+      }
+
+      // Handle string sorting
+      if (typeof aValue === "string") {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+      }
+
+      if (sortOrder === "asc") {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+    setFilteredCases(result);
+
+    // Update pagination
+    setPagination((prev) => ({
+      ...prev,
+      page: 1, // Reset to first page on filter change
+      total: result.length,
+      totalPages: Math.ceil(result.length / prev.limit),
+    }));
+  };
+
+  const paginateCases = () => {
+    const startIndex = (pagination.page - 1) * pagination.limit;
+    const endIndex = startIndex + pagination.limit;
+    setDisplayedCases(filteredCases.slice(startIndex, endIndex));
+  };
+
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
-    setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
   const getStatusColor = (status) => {
     const statusColors = {
-      submitted: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-      pending_study_payment_verification: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
-      study_in_progress: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
-      study_completed: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-      quote_pending: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
-      quote_sent: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400",
-      quote_accepted: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-      quote_rejected: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-      in_production: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400",
-      production_completed: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-      ready_for_pickup: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400",
-      delivered: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-      completed: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-      cancelled: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400",
+      submitted:
+        "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+      pending_study_payment_verification:
+        "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
+      study_in_progress:
+        "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
+      study_completed:
+        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+      quote_pending:
+        "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
+      quote_sent:
+        "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400",
+      quote_accepted:
+        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+      quote_rejected:
+        "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+      in_production:
+        "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400",
+      production_completed:
+        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+      ready_for_pickup:
+        "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400",
+      delivered:
+        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+      completed:
+        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+      cancelled:
+        "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400",
     };
-    return statusColors[status] || "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400";
+    return (
+      statusColors[status] ||
+      "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400"
+    );
   };
 
   const formatDate = (dateString) => {
@@ -110,7 +268,7 @@ const MyCases = () => {
     return status.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
-  if (loading && !cases.length) {
+  if (loading && !allCases.length) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
@@ -133,92 +291,142 @@ const MyCases = () => {
 
         {/* Stats Cards */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-            <div className="bg-light dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 transition-all hover:shadow-lg">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
+            <div className="bg-light dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-200 dark:border-gray-700 transition-all hover:shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-charcoal dark:text-gray-400 mb-1">
+                  <p className="text-xs md:text-sm text-charcoal dark:text-gray-400 mb-1">
                     {t("dashboard.stats.total")}
                   </p>
-                  <p className="text-3xl font-bold text-primary dark:text-light">
+                  <p className="text-2xl md:text-3xl font-bold text-primary dark:text-light">
                     {stats.overview.total}
                   </p>
                 </div>
-                <div className="w-12 h-12 bg-primary/10 dark:bg-accent/20 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-primary dark:text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 dark:bg-accent/20 rounded-lg flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 md:w-6 md:h-6 text-primary dark:text-accent"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
                   </svg>
                 </div>
               </div>
             </div>
 
-            <div className="bg-light dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 transition-all hover:shadow-lg">
+            <div className="bg-light dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-200 dark:border-gray-700 transition-all hover:shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-charcoal dark:text-gray-400 mb-1">
+                  <p className="text-xs md:text-sm text-charcoal dark:text-gray-400 mb-1">
                     {t("dashboard.stats.pending")}
                   </p>
-                  <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
+                  <p className="text-2xl md:text-3xl font-bold text-yellow-600 dark:text-yellow-400">
                     {stats.overview.pending}
                   </p>
                 </div>
-                <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 md:w-6 md:h-6 text-yellow-600 dark:text-yellow-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 </div>
               </div>
             </div>
 
-            <div className="bg-light dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 transition-all hover:shadow-lg">
+            <div className="bg-light dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-200 dark:border-gray-700 transition-all hover:shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-charcoal dark:text-gray-400 mb-1">
+                  <p className="text-xs md:text-sm text-charcoal dark:text-gray-400 mb-1">
                     {t("dashboard.stats.active")}
                   </p>
-                  <p className="text-3xl font-bold text-accent dark:text-accent-secondary">
+                  <p className="text-2xl md:text-3xl font-bold text-accent dark:text-accent-secondary">
                     {stats.overview.active}
                   </p>
                 </div>
-                <div className="w-12 h-12 bg-accent/10 dark:bg-accent/20 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-accent dark:text-accent-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-accent/10 dark:bg-accent/20 rounded-lg flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 md:w-6 md:h-6 text-accent dark:text-accent-secondary"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
                   </svg>
                 </div>
               </div>
             </div>
 
-            <div className="bg-light dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 transition-all hover:shadow-lg">
+            <div className="bg-light dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-200 dark:border-gray-700 transition-all hover:shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-charcoal dark:text-gray-400 mb-1">
+                  <p className="text-xs md:text-sm text-charcoal dark:text-gray-400 mb-1">
                     {t("dashboard.stats.delivered")}
                   </p>
-                  <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+                  <p className="text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400">
                     {stats.overview.delivered}
                   </p>
                 </div>
-                <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 md:w-6 md:h-6 text-green-600 dark:text-green-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 </div>
               </div>
             </div>
 
-            <div className="bg-light dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 transition-all hover:shadow-lg">
+            <div className="bg-light dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-200 dark:border-gray-700 transition-all hover:shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-charcoal dark:text-gray-400 mb-1">
+                  <p className="text-xs md:text-sm text-charcoal dark:text-gray-400 mb-1">
                     {t("dashboard.stats.cancelled")}
                   </p>
-                  <p className="text-3xl font-bold text-gray-600 dark:text-gray-400">
+                  <p className="text-2xl md:text-3xl font-bold text-gray-600 dark:text-gray-400">
                     {stats.overview.cancelled}
                   </p>
                 </div>
-                <div className="w-12 h-12 bg-gray-100 dark:bg-gray-900/30 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 dark:bg-gray-900/30 rounded-lg flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 md:w-6 md:h-6 text-gray-600 dark:text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </div>
               </div>
@@ -270,7 +478,9 @@ const MyCases = () => {
               </label>
               <select
                 value={filters.procedureCategory}
-                onChange={(e) => handleFilterChange("procedureCategory", e.target.value)}
+                onChange={(e) =>
+                  handleFilterChange("procedureCategory", e.target.value)
+                }
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-charcoal dark:text-light focus:ring-2 focus:ring-accent focus:border-transparent transition-colors"
               >
                 <option value="">{t("dashboard.filters.allCategories")}</option>
@@ -312,11 +522,13 @@ const MyCases = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {cases.map((caseItem) => (
+                {displayedCases.map((caseItem) => (
                   <tr
                     key={caseItem.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors cursor-pointer"
-                    onClick={() => window.location.href = `/dashboard/cases/${caseItem.id}`}
+                    onClick={() =>
+                      (window.location.href = `/dashboard/cases/${caseItem.id}`)
+                    }
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-primary dark:text-accent">
@@ -332,11 +544,17 @@ const MyCases = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-charcoal dark:text-light">
-                        {caseItem.procedureCategory.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                        {caseItem.procedureCategory
+                          .replace(/_/g, " ")
+                          .replace(/\b\w/g, (l) => l.toUpperCase())}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(caseItem.status)}`}>
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                          caseItem.status
+                        )}`}
+                      >
                         {formatStatus(caseItem.status)}
                       </span>
                     </td>
@@ -364,10 +582,20 @@ const MyCases = () => {
           </div>
 
           {/* Empty State */}
-          {!loading && cases.length === 0 && (
+          {!loading && displayedCases.length === 0 && (
             <div className="text-center py-12">
-              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <svg
+                className="mx-auto h-12 w-12 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
               </svg>
               <h3 className="mt-2 text-sm font-medium text-charcoal dark:text-light">
                 {t("dashboard.empty.title")}
@@ -377,11 +605,23 @@ const MyCases = () => {
               </p>
               <div className="mt-6">
                 <button
-                  onClick={() => window.location.href = "/dashboard/cases/new"}
+                  onClick={() =>
+                    (window.location.href = "/dashboard/cases/new")
+                  }
                   className="inline-flex items-center px-4 py-2 bg-primary hover:bg-primary/90 dark:bg-accent dark:hover:bg-accent/90 text-light rounded-lg font-medium transition-all shadow-md hover:shadow-lg"
                 >
-                  <svg className="w-5 h-5 mr-2 rtl:mr-0 rtl:ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  <svg
+                    className="w-5 h-5 mr-2 rtl:mr-0 rtl:ml-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
                   </svg>
                   {t("dashboard.empty.createCase")}
                 </button>
@@ -394,12 +634,14 @@ const MyCases = () => {
             <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
               <div className="text-sm text-charcoal dark:text-gray-400">
                 Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-                {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
-                {pagination.total} results
+                {Math.min(pagination.page * pagination.limit, pagination.total)}{" "}
+                of {pagination.total} results
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={() => setPagination((prev) => ({ ...prev, page: prev.page - 1 }))}
+                  onClick={() =>
+                    setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
+                  }
                   disabled={pagination.page === 1}
                   className="px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-charcoal dark:text-light rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -409,7 +651,9 @@ const MyCases = () => {
                   Page {pagination.page} of {pagination.totalPages}
                 </span>
                 <button
-                  onClick={() => setPagination((prev) => ({ ...prev, page: prev.page + 1 }))}
+                  onClick={() =>
+                    setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
+                  }
                   disabled={pagination.page === pagination.totalPages}
                   className="px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-charcoal dark:text-light rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >

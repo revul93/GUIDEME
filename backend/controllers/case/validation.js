@@ -1,91 +1,43 @@
 export const validateCaseData = (data) => {
-  const {
-    procedureCategory,
-    guideType,
-    requiredService,
-    implantSystem,
-    implantSystemOther,
-    isDraft,
-  } = data;
+  const errors = {};
 
-  const errors = [];
+  // Required fields
+  if (!data.procedureCategory) {
+    errors.procedureCategory = "Procedure category is required";
+  }
 
-  const validProcedureCategories = [
-    "single_implant",
-    "multiple_implant",
-    "full_arch",
-    "gbr",
-    "other",
-  ];
+  if (!data.guideType) {
+    errors.guideType = "Guide type is required";
+  }
 
-  const validGuideTypes = [
-    "tooth_support",
-    "tissue_support",
-    "bone_support",
-    "stackable",
-    "hybrid",
-    "other",
-  ];
+  if (!data.requiredService) {
+    errors.requiredService = "Required service is required";
+  }
 
-  const validRequiredServices = ["study_only", "full_solution"];
-
-  const validImplantSystems = [
-    "nobel_biocare",
-    "straumann",
-    "zimmer_biomet",
-    "osstem",
-    "hiossen",
-    "dentium",
-    "megagen",
-    "bicon",
-    "neodent",
-    "other",
-  ];
-
-  if (!isDraft) {
-    if (!procedureCategory) {
-      errors.push("Procedure category is required");
-    } else if (!validProcedureCategories.includes(procedureCategory)) {
-      errors.push("Invalid procedure category");
-    }
-
-    if (!guideType) {
-      errors.push("Guide type is required");
-    } else if (!validGuideTypes.includes(guideType)) {
-      errors.push("Invalid guide type");
-    }
-
-    if (!requiredService) {
-      errors.push("Required service is required");
-    } else if (!validRequiredServices.includes(requiredService)) {
-      errors.push("Invalid required service");
-    }
-  } else {
-    if (procedureCategory && !validProcedureCategories.includes(procedureCategory)) {
-      errors.push("Invalid procedure category");
-    }
-
-    if (guideType && !validGuideTypes.includes(guideType)) {
-      errors.push("Invalid guide type");
-    }
-
-    if (requiredService && !validRequiredServices.includes(requiredService)) {
-      errors.push("Invalid required service");
+  // Validate teeth numbers for specific procedure categories
+  if (["single_implant", "multiple_implant"].includes(data.procedureCategory)) {
+    if (!data.teethNumbers || data.teethNumbers.length === 0) {
+      errors.teethNumbers = "Teeth selection is required for this procedure";
     }
   }
 
-  if (implantSystem) {
-    if (!validImplantSystems.includes(implantSystem)) {
-      errors.push("Invalid implant system");
+  // Validate delivery details for full solution
+  if (data.requiredService === "full_solution") {
+    if (!data.deliveryMethod) {
+      errors.deliveryMethod = "Delivery method is required for full solution";
     }
 
-    if (implantSystem === "other" && !implantSystemOther) {
-      errors.push("Please specify implant system");
+    if (data.deliveryMethod === "delivery" && !data.deliveryAddressId) {
+      errors.deliveryAddressId = "Delivery address is required";
+    }
+
+    if (data.deliveryMethod === "pickup" && !data.pickupBranchId) {
+      errors.pickupBranchId = "Pickup branch is required";
     }
   }
 
   return {
-    valid: errors.length === 0,
+    valid: Object.keys(errors).length === 0,
     errors,
   };
 };

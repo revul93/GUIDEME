@@ -316,6 +316,228 @@
       "createCase": "Create New Case"
     }
   },
+  "newCase": {
+    "title": "New Case",
+    "subtitle": "Submit a new dental case for study and guide fabrication",
+    "optional": "Optional",
+    "steps": {
+      "caseDetails": "Case Details",
+      "fileUpload": "Upload Files",
+      "delivery": "Delivery",
+      "review": "Review & Submit"
+    },
+    "caseDetails": {
+      "title": "Case Details",
+      "subtitle": "Provide information about the procedure and patient"
+    },
+    "fields": {
+      "patientRef": "Patient Reference",
+      "procedureCategory": "Procedure Category",
+      "guideType": "Guide Type",
+      "requiredService": "Required Service",
+      "teethSelection": "Teeth Selection",
+      "implantSystem": "Implant System",
+      "implantSystemOther": "Specify Implant System",
+      "clinicalNotes": "Clinical Notes",
+      "deliveryMethod": "Delivery Method",
+      "deliveryAddress": "Delivery Address",
+      "pickupBranch": "Pickup Branch"
+    },
+    "placeholders": {
+      "patientRef": "Patient ID or name for your records",
+      "implantSystem": "Select implant system...",
+      "implantSystemOther": "Specify implant system...",
+      "clinicalNotes": "Add any clinical notes or special instructions..."
+    },
+    "hints": {
+      "patientRef": "This is for your reference only and won't be shared"
+    },
+    "fileUpload": {
+      "title": "Upload Files",
+      "subtitle": "Select files to upload with your case",
+      "dicom": "DICOM Files",
+      "dicomDesc": "CBCT or CT scans",
+      "ctScan": "CT Scan",
+      "ctScanDesc": "CT scan files",
+      "stl": "STL Files",
+      "stlDesc": "3D scan files",
+      "clinicalPhoto": "Clinical Photos",
+      "clinicalPhotoDesc": "Patient photos",
+      "prescription": "Prescription",
+      "prescriptionDesc": "Treatment plan/prescription",
+      "other": "Other Files",
+      "otherDesc": "ZIP, PDF, etc.",
+      "selectFiles": "Select files",
+      "clickToUpload": "Click to upload",
+      "dragAndDrop": "or drag and drop",
+      "uploading": "Uploading...",
+      "files": "files",
+      "filesReady": "files ready to upload",
+      "fileTooLarge": "File size exceeds 100MB",
+      "uploadFailed": "Upload failed. Please try again.",
+      "stageNotice": "Files will be uploaded when you submit the case",
+      "notice": "Maximum file size is 100MB. Supported formats: DICOM, STL, images, PDF, ZIP."
+    },
+    "delivery": {
+      "title": "Delivery Details",
+      "subtitle": "Choose how you want to receive the surgical guide",
+      "deliveryToAddress": "Delivery to Address",
+      "deliveryDesc": "We'll ship the guide to your address",
+      "pickupFromBranch": "Pickup from Branch",
+      "pickupDesc": "Pick up from our nearest branch",
+      "noAddresses": "No delivery addresses",
+      "addAddressFirst": "Please add a delivery address in your profile",
+      "addAddress": "Add Address"
+    },
+    "review": {
+      "title": "Review & Submit",
+      "subtitle": "Review your case details before submission",
+      "caseDetails": "Case Details",
+      "uploadedFiles": "Uploaded Files",
+      "filesUploaded": "files uploaded",
+      "deliveryDetails": "Delivery Details",
+      "termsText": "I agree to the terms and conditions",
+      "termsDescription": "By submitting this case, you agree to pay the study fee of 100 SAR",
+      "importantNotice": "Important Notice",
+      "paymentNotice": "A study fee of 100 SAR is required before case processing begins"
+    },
+    "modal": {
+      "successTitle": "Success!",
+      "errorTitle": "Error",
+      "close": "Close"
+    },
+    "upload": {
+      "uploading": "Uploading Files...",
+      "progress": "File",
+      "of": "of",
+      "pleaseWait": "Please wait, do not close this window"
+    },
+    "errors": {
+      "procedureCategoryRequired": "Please select a procedure category",
+      "guideTypeRequired": "Please select a guide type",
+      "requiredServiceRequired": "Please select a required service",
+      "implantSystemOtherRequired": "Please specify the implant system",
+      "teethRequired": "Please select at least one tooth",
+      "deliveryMethodRequired": "Please select a delivery method",
+      "deliveryAddressRequired": "Please select a delivery address",
+      "pickupBranchRequired": "Please select a pickup branch",
+      "termsRequired": "Please accept the terms and conditions",
+      "validationFailed": "Please fix the errors before proceeding",
+      "submitFailed": "Failed to submit case. Please try again."
+    },
+    "success": {
+      "caseSubmitted": "Case submitted successfully! Redirecting..."
+    },
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit Case",
+    "submitting": "Submitting...",
+    "studyFeeNotice": "Study Fee",
+    "studyFeeAmount": "100 SAR (required before case processing)"
+  },
+  "viewCase": {
+    "title": "Case Details",
+    "backToCases": "Back to Cases",
+    "patientRef": "Patient Reference",
+    "tabs": {
+      "details": "Details",
+      "history": "Status History",
+      "comments": "Comments"
+    },
+    "caseInformation": "Case Information",
+    "uploadedFiles": "Uploaded Files",
+    "clientInformation": "Client Information",
+    "statusHistory": "Status History",
+    "noHistory": "No status history available",
+    "changedBy": "Changed by",
+    "fields": {
+      "caseNumber": "Case Number",
+      "patientRef": "Patient Reference",
+      "procedureCategory": "Procedure Category",
+      "guideType": "Guide Type",
+      "requiredService": "Required Service",
+      "implantSystem": "Implant System",
+      "teethNumbers": "Teeth Numbers",
+      "submittedAt": "Submitted At",
+      "deliveryMethod": "Delivery Method",
+      "clinicalNotes": "Clinical Notes",
+      "clientName": "Client Name",
+      "clientType": "Client Type"
+    },
+    "comments": {
+      "title": "Comments",
+      "placeholder": "Write a comment...",
+      "attachFile": "Attach File",
+      "uploading": "Uploading...",
+      "submit": "Submit",
+      "submitting": "Submitting...",
+      "noComments": "No comments yet. Be the first to comment!",
+      "fileTooLarge": "File size must be less than 10MB",
+      "submitFailed": "Failed to submit comment. Please try again."
+    },
+    "errors": {
+      "loadFailed": "Failed to load case details"
+    }
+  },
+  "status": {
+    "submitted": "Submitted",
+    "pending": "Pending Review",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "rejected": "Rejected"
+  },
+  "procedureCategory": {
+    "single_implant": "Single Implant",
+    "multiple_implant": "Multiple Implants",
+    "full_arch": "Full Arch",
+    "gbr": "GBR",
+    "other": "Other"
+  },
+  "guideType": {
+    "tooth_support": "Tooth Support",
+    "tissue_support": "Tissue Support",
+    "bone_support": "Bone Support",
+    "stackable": "Stackable",
+    "hybrid": "Hybrid",
+    "other": "Other"
+  },
+  "requiredService": {
+    "study_only": "Study Only",
+    "full_solution": "Full Solution"
+  },
+  "deliveryMethod": {
+    "delivery": "Delivery to Address",
+    "pickup": "Pickup from Branch"
+  },
+  "fileCategory": {
+    "dicom": "DICOM Files",
+    "ct_scan": "CT Scan",
+    "stl": "STL Files",
+    "clinical_photo": "Clinical Photos",
+    "prescription": "Prescription",
+    "other": "Other Files"
+  },
+  "clientType": {
+    "dentist": "Dentist",
+    "clinic": "Clinic",
+    "lab": "Lab"
+  },
+  "changedBy": {
+    "client": "Client",
+    "designer": "Designer",
+    "admin": "Admin",
+    "system": "System"
+  },
+  "commentedBy": {
+    "client": "Client",
+    "designer": "Designer"
+  },
+  "common": {
+    "loading": "Loading...",
+    "close": "Close",
+    "default": "Default"
+  },
   "pagination": {
     "previous": "Previous",
     "next": "Next"

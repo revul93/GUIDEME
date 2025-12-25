@@ -206,7 +206,7 @@ const Header = () => {
           {
             id: "new-case",
             label: t("nav.newCase"),
-            path: "/dashboard/new-case",
+            path: "/dashboard/newcase",
           },
           {
             id: "my-payments",
