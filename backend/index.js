@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import morgan from "morgan";
 import apiRoutes from "./routes/api.js";
 import logger from "./utils/logger.js";
+import path from "path";
 
 dotenv.config();
 

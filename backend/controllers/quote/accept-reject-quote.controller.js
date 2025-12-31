@@ -1,5 +1,7 @@
 import prisma from "../../config/db.js";
 import logger from "../../utils/logger.js";
+import { createWebNotification } from "../../services/notification.service.js";
+import { recordDiscountUsage } from "../../services/discount.service.js";
 
 export const acceptQuote = async (req, res) => {
   try {
@@ -16,6 +18,7 @@ export const acceptQuote = async (req, res) => {
       where: { id: parseInt(id) },
       include: {
         case: true,
+        discountCode: true, // ADD: Include discount code
       },
     });
 
@@ -59,6 +62,30 @@ export const acceptQuote = async (req, res) => {
       });
     }
 
+    // NEW: Record discount usage if discount code was applied
+    if (quote.discountCodeId && quote.discountAmount > 0) {
+      const orderAmount =
+        quote.productionFee + quote.designFee + quote.deliveryFee;
+      const finalAmount = orderAmount - quote.discountAmount;
+
+      await recordDiscountUsage(
+        quote.discountCodeId,
+        quote.case.clientProfileId,
+        quote.caseId,
+        quote.id,
+        orderAmount,
+        quote.discountAmount,
+        finalAmount
+      );
+
+      logger.info("Discount usage recorded for accepted quote", {
+        quoteId: quote.id,
+        discountCode: quote.discountCode.code,
+        discountAmount: quote.discountAmount,
+      });
+    }
+
+    // EXISTING: Update quote
     await prisma.caseQuote.update({
       where: { id: parseInt(id) },
       data: {
@@ -67,26 +94,40 @@ export const acceptQuote = async (req, res) => {
       },
     });
 
+    // EXISTING: Update case status
     await prisma.case.update({
       where: { id: quote.caseId },
       data: { status: "quote_accepted" },
     });
 
+    // EXISTING: Create status history
     await prisma.caseStatusHistory.create({
       data: {
         caseId: quote.caseId,
         fromStatus: "quote_sent",
         toStatus: "quote_accepted",
         changedBy: "client",
-        changedById: null,
-        notes: "Quote accepted by doctor",
+        changedByClientId: req.user.profile.id,
       },
     });
 
-    res.status(200).json({
+    logger.info("Quote accepted", {
+      quoteId: quote.id,
+      caseId: quote.caseId,
+      userId: req.user.id,
+    });
+
+    res.json({
       success: true,
-      message:
-        "Quote accepted successfully. Please proceed with production payment",
+      message: "Quote accepted successfully",
+      data: {
+        quote: {
+          id: quote.id,
+          quoteNumber: quote.quoteNumber,
+          totalAmount: quote.totalAmount,
+          acceptedAt: new Date(),
+        },
+      },
     });
   } catch (error) {
     logger.error("Controller error:", {
@@ -94,8 +135,9 @@ export const acceptQuote = async (req, res) => {
       stack: error.stack,
       controller: "acceptQuote",
       userId: req.user?.id,
-      caseId: req.params?.id,
+      quoteId: req.params?.id,
     });
+
     return res.status(500).json({
       success: false,
       message: "Failed to accept quote",
@@ -125,11 +167,15 @@ export const rejectQuote = async (req, res) => {
     const quote = await prisma.caseQuote.findUnique({
       where: { id: parseInt(id) },
       include: {
-        case: true,
+        case: {
+          include: {
+            clientProfile: true,
+          },
+        },
       },
     });
 
-    if (!quote) {
+    if (!quote || quote.deletedAt) {
       return res.status(404).json({
         success: false,
         message: "Quote not found",
@@ -150,6 +196,7 @@ export const rejectQuote = async (req, res) => {
       });
     }
 
+    // Update quote
     await prisma.caseQuote.update({
       where: { id: parseInt(id) },
       data: {
@@ -161,22 +208,56 @@ export const rejectQuote = async (req, res) => {
 
     const newStatus = requestRevision ? "quote_rejected" : "cancelled";
 
+    // Update case status
     await prisma.case.update({
       where: { id: quote.caseId },
       data: { status: newStatus },
     });
 
+    // Create status history - FIXED: correct field names
     await prisma.caseStatusHistory.create({
       data: {
         caseId: quote.caseId,
         fromStatus: "quote_sent",
         toStatus: newStatus,
         changedBy: "client",
-        changedById: null,
+        changedByClientId: req.user.profile.id, // FIXED
         notes: requestRevision
           ? `Quote rejected. Reason: ${rejectionReason.trim()}. Revision requested`
           : `Quote rejected and case cancelled. Reason: ${rejectionReason.trim()}`,
       },
+    });
+
+    // Notify admin designers (web notification)
+    const admins = await prisma.designerProfile.findMany({
+      where: { isAdmin: true, deletedAt: null },
+      include: { user: true },
+    });
+
+    for (const admin of admins) {
+      createWebNotification({
+        userId: admin.user.id,
+        purpose: "quote_sent",
+        title: `Quote Rejected - ${quote.case.caseNumber}`,
+        body: requestRevision
+          ? `Client rejected quote. Revision requested: ${rejectionReason.trim()}`
+          : `Client rejected quote and cancelled case`,
+        actionUrl: `/cases/${quote.caseId}/quotes/${quote.id}`,
+        metadata: { quoteId: quote.id, caseId: quote.caseId, requestRevision },
+        language: admin.user.preferredLanguage || "en",
+      }).catch((error) => {
+        logger.error("Failed to notify admin:", {
+          error: error.message,
+          adminId: admin.user.id,
+        });
+      });
+    }
+
+    logger.info("Quote rejected", {
+      quoteId: quote.id,
+      caseId: quote.caseId,
+      requestRevision,
+      userId: req.user.id,
     });
 
     res.status(200).json({
@@ -191,7 +272,7 @@ export const rejectQuote = async (req, res) => {
       stack: error.stack,
       controller: "rejectQuote",
       userId: req.user?.id,
-      caseId: req.params?.id,
+      quoteId: req.params?.id,
     });
     return res.status(500).json({
       success: false,

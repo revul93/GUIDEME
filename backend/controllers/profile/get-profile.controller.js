@@ -21,17 +21,24 @@ export const getProfile = async (req, res) => {
             emailVerified: true,
             phoneVerified: true,
             accountStatus: true,
+            preferredLanguage: true,
+            timezone: true,
+            notificationPreferences: true,
             createdAt: true,
             lastLoginAt: true,
           },
         },
         addresses: {
+          where: {
+            deletedAt: null, // FIXED: Add soft delete check
+          },
           orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
         },
       },
     });
 
-    if (!profile) {
+    if (!profile || profile.deletedAt) {
+      // FIXED: Check profile soft delete
       return res.status(404).json({
         success: false,
         message: "Profile not found",
@@ -45,9 +52,11 @@ export const getProfile = async (req, res) => {
           id: profile.id,
           clientType: profile.clientType,
           name: profile.name,
+          profileImageUrl: profile.profileImageUrl, // FIXED: Added
           specialty: profile.specialty,
           specialtyOther: profile.specialtyOther,
           clinicName: profile.clinicName,
+          labName: profile.labName, // FIXED: Added
           createdAt: profile.createdAt,
           updatedAt: profile.updatedAt,
         },
@@ -61,7 +70,6 @@ export const getProfile = async (req, res) => {
       stack: error.stack,
       controller: "getProfile",
       userId: req.user?.id,
-      caseId: req.params?.id,
     });
     return res.status(500).json({
       success: false,

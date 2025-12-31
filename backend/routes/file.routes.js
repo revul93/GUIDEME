@@ -9,7 +9,7 @@ import {
   upload,
   handleFileUpload,
   handleMultipleFileUpload,
-} from "../controllers/file/fileUpload.service.js";
+} from "../services/fileUpload.service.js";
 
 const router = express.Router();
 
@@ -27,6 +27,8 @@ router.post(
 // File metadata endpoints
 router.post("/cases/:id/files", uploadFile); // Save file metadata to database
 router.get("/cases/:id/files", listFiles);
+
+// TODO: Must be admin to delete files
 router.delete("/:id", deleteFile);
 
 export default router;

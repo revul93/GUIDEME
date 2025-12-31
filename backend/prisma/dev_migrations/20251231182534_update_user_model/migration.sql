@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN "ReactivatedAt" DATETIME;
+ALTER TABLE "User" ADD COLUMN "UnlockedAt" DATETIME;
+ALTER TABLE "User" ADD COLUMN "approvedAt" DATETIME;
+ALTER TABLE "User" ADD COLUMN "suspendedAt" DATETIME;

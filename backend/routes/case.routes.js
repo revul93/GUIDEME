@@ -5,28 +5,24 @@ import {
   getCase,
   getCases,
   getCaseStatusHistory,
-  getCaseComments,
-  createCaseComment,
   getCaseStats,
+  updateCase,
 } from "../controllers/case/index.js";
 
 const router = express.Router();
 
-// Stats (must be before /:id)
+// Stats endpoint
 router.get("/stats", authenticate, getCaseStats);
 
-// List cases (must be before /:id)
+// List and create cases
 router.get("/", authenticate, getCases);
-
-// Case CRUD
 router.post("/", authenticate, createCase);
+
+// Specific case operations
 router.get("/:id", authenticate, getCase);
+router.put("/:id", authenticate, updateCase);
 
-// Status History
+// Case status history
 router.get("/:id/status-history", authenticate, getCaseStatusHistory);
-
-// Comments
-router.get("/:id/comments", authenticate, getCaseComments);
-router.post("/:id/comments", authenticate, createCaseComment);
 
 export default router;

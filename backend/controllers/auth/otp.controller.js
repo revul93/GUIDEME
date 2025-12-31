@@ -3,7 +3,7 @@ import {
   createOtpRecord,
   verifyOtp,
 } from "../../services/otp.service.js";
-import { sendOtp, isChannelConfigured } from "../../services/twilio.service.js";
+import { sendOtpNotification } from "../../services/notification.service.js";
 import { handleRegister } from "./register.controller.js";
 import { handleLogin, handleFailedLogin } from "./login.controller.js";
 import {
@@ -12,6 +12,21 @@ import {
   checkUserExistsForRegister,
 } from "./validation.js";
 import logger from "../../utils/logger.js";
+
+// Check if channel is configured
+const isChannelConfigured = (channel) => {
+  if (channel === "email") {
+    return !!(process.env.SMTP_HOST && process.env.SMTP_USER);
+  }
+  if (channel === "whatsapp") {
+    return !!(
+      process.env.TWILIO_ACCOUNT_SID &&
+      process.env.TWILIO_AUTH_TOKEN &&
+      process.env.TWILIO_WHATSAPP_NUMBER
+    );
+  }
+  return false;
+};
 
 export const sendOtpHandler = async (req, res) => {
   try {
@@ -42,6 +57,8 @@ export const sendOtpHandler = async (req, res) => {
     }
 
     let userId = null;
+    let userName = "";
+    let userLanguage = "en";
 
     if (purpose === "login") {
       const userCheck = await checkUserExistsForLogin(identifier);
@@ -52,6 +69,11 @@ export const sendOtpHandler = async (req, res) => {
         });
       }
       userId = userCheck.user.id;
+      userName =
+        userCheck.user.clientProfile?.name ||
+        userCheck.user.designerProfile?.name ||
+        "";
+      userLanguage = userCheck.user.preferredLanguage || "en";
     }
 
     if (purpose === "register") {
@@ -62,6 +84,7 @@ export const sendOtpHandler = async (req, res) => {
           message: userCheck.message,
         });
       }
+      userLanguage = "en";
     }
 
     const { code, expiresIn } = await createOtpRecord(
@@ -71,12 +94,20 @@ export const sendOtpHandler = async (req, res) => {
       userId
     );
 
-    const sendResult = await sendOtp(identifier, code, channel, purpose);
+    const sendResult = await sendOtpNotification(
+      userId,
+      identifier,
+      code,
+      channel,
+      purpose,
+      userName,
+      userLanguage
+    );
 
     if (!sendResult.success) {
       return res.status(500).json({
         success: false,
-        message: sendResult.message,
+        message: sendResult.message || `Failed to send OTP via ${channel}`,
         error: sendResult.error,
       });
     }
@@ -96,9 +127,9 @@ export const sendOtpHandler = async (req, res) => {
   } catch (error) {
     logger.error("Controller error:", {
       error: error.message,
+      stack: error.stack,
       controller: "sendOtpHandler",
       userId: req.user?.id,
-      caseId: req.params?.id,
     });
     return res.status(500).json({
       success: false,
@@ -168,9 +199,9 @@ export const verifyOtpHandler = async (req, res) => {
   } catch (error) {
     logger.error("Controller error:", {
       error: error.message,
+      stack: error.stack,
       controller: "verifyOtpHandler",
       userId: req.user?.id,
-      caseId: req.params?.id,
     });
     return res.status(500).json({
       success: false,

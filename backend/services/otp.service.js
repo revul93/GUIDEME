@@ -3,6 +3,7 @@ import prisma from "../config/db.js";
 import dotenv from "dotenv";
 
 dotenv.config();
+
 const OTP_LENGTH = parseInt(process.env.OTP_LENGTH) || 6;
 const OTP_EXPIRY_MINUTES = parseInt(process.env.OTP_EXPIRY_MINUTES) || 5;
 const OTP_MAX_ATTEMPTS = parseInt(process.env.OTP_MAX_ATTEMPTS) || 3;
@@ -137,10 +138,15 @@ export const verifyOtp = async (identifier, code, channel, purpose) => {
       data: { attempts: { increment: 1 } },
     });
 
-    await prisma.user.update({
-      where: { or: { email: identifier, phone: identifier } },
-      data: { failedOtpAttempts: { increment: 1 } },
-    });
+    if (otpRecord.userId) {
+      await prisma.user.update({
+        where: { id: otpRecord.userId },
+        data: {
+          failedLoginAttempts: { increment: 1 },
+          lastFailedLoginAt: new Date(),
+        },
+      });
+    }
 
     const remainingAttempts = OTP_MAX_ATTEMPTS - otpRecord.attempts - 1;
     return {
@@ -159,6 +165,16 @@ export const verifyOtp = async (identifier, code, channel, purpose) => {
       usedAt: new Date(),
     },
   });
+
+  if (otpRecord.userId) {
+    await prisma.user.update({
+      where: { id: otpRecord.userId },
+      data: {
+        failedLoginAttempts: 0,
+        lastFailedLoginAt: null,
+      },
+    });
+  }
 
   return { valid: true, otpRecord };
 };

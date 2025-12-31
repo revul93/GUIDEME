@@ -1,10 +1,10 @@
 import prisma from "../../config/db.js";
 import logger from "../../utils/logger.js";
-// import { awardPoints } from "../../utils/loyalty.js";
+import { sendPaymentNotification } from "../../services/notification.service.js";
 
 export const verifyPayment = async (req, res) => {
   try {
-    if (req.user.role !== "designer" || !req.user.designerProfile?.isAdmin) {
+    if (req.user.role !== "designer" || !req.user.profile.isAdmin) {
       return res.status(403).json({
         success: false,
         message: "Only admins can verify payments",
@@ -20,9 +20,8 @@ export const verifyPayment = async (req, res) => {
         case: {
           include: {
             clientProfile: {
-              select: {
-                id: true,
-                clientType: true,
+              include: {
+                user: true,
               },
             },
           },
@@ -30,7 +29,7 @@ export const verifyPayment = async (req, res) => {
       },
     });
 
-    if (!payment) {
+    if (!payment || payment.deletedAt) {
       return res.status(404).json({
         success: false,
         message: "Payment not found",
@@ -44,18 +43,6 @@ export const verifyPayment = async (req, res) => {
       });
     }
 
-    // Update payment status
-    await prisma.payment.update({
-      where: { id: parseInt(id) },
-      data: {
-        status: "verified",
-        verifiedAt: new Date(),
-        verifiedBy: {
-          connect: { id: req.user.designerProfile.id },
-        },
-      },
-    });
-
     // Determine new case status
     let newCaseStatus;
     let statusNote;
@@ -68,46 +55,52 @@ export const verifyPayment = async (req, res) => {
       statusNote = "Production payment verified, case in production";
     }
 
+    // Update payment status - FIXED: correct Prisma syntax
+    await prisma.payment.update({
+      where: { id: parseInt(id) },
+      data: {
+        status: "verified",
+        isVerified: true,
+        verifiedAt: new Date(),
+        verifiedById: req.user.profile.id, // FIXED: direct field instead of connect
+        notes: verificationNotes
+          ? `${payment.notes || ""}\nVerification: ${verificationNotes}`.trim()
+          : payment.notes,
+      },
+    });
+
     // Update case status
     await prisma.case.update({
       where: { id: payment.caseId },
       data: { status: newCaseStatus },
     });
 
-    // Create status history
+    // Create status history - FIXED: correct field names
     await prisma.caseStatusHistory.create({
       data: {
         caseId: payment.caseId,
         fromStatus: payment.case.status,
         toStatus: newCaseStatus,
         changedBy: "designer",
-        changedById: req.user.designerProfile.id,
+        changedByDesignerId: req.user.profile.id, // FIXED
         notes: statusNote,
       },
     });
 
-    // Award loyalty points if client is a lab
-    /* if (payment.case.clientProfile.clientType === "lab") {
-      try {
-        await awardPoints(
-          payment.case.clientProfile.id,
-          payment.amount,
-          payment.id
-        );
-        logger.info("Loyalty points awarded:", {
-          paymentId: payment.id,
-          clientProfileId: payment.case.clientProfile.id,
-          amount: payment.amount,
-        });
-      } catch (pointsError) {
-        // Don't fail payment verification if points award fails
-        logger.error("Failed to award loyalty points:", {
-          error: pointsError.message,
-          paymentId: payment.id,
-          clientProfileId: payment.case.clientProfile.id,
-        });
-      }
-    } */
+    // Send notification (email + web)
+    const clientUser = payment.case.clientProfile.user;
+    sendPaymentNotification(
+      clientUser.id,
+      clientUser.email,
+      { ...payment, case: payment.case },
+      true, // isVerified
+      clientUser.preferredLanguage
+    ).catch((error) => {
+      logger.error("Failed to send payment notification:", {
+        error: error.message,
+        paymentId: payment.id,
+      });
+    });
 
     logger.info("Payment verified:", {
       paymentId: payment.id,
@@ -130,14 +123,13 @@ export const verifyPayment = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to verify payment",
-      error: error.message,
     });
   }
 };
 
 export const rejectPayment = async (req, res) => {
   try {
-    if (req.user.role !== "designer" || !req.user.designerProfile?.isAdmin) {
+    if (req.user.role !== "designer" || !req.user.profile.isAdmin) {
       return res.status(403).json({
         success: false,
         message: "Only admins can reject payments",
@@ -157,11 +149,19 @@ export const rejectPayment = async (req, res) => {
     const payment = await prisma.payment.findUnique({
       where: { id: parseInt(id) },
       include: {
-        case: true,
+        case: {
+          include: {
+            clientProfile: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
       },
     });
 
-    if (!payment) {
+    if (!payment || payment.deletedAt) {
       return res.status(404).json({
         success: false,
         message: "Payment not found",
@@ -175,40 +175,58 @@ export const rejectPayment = async (req, res) => {
       });
     }
 
+    // Determine case status to revert to
+    let newCaseStatus;
+
+    if (payment.paymentType === "study_fee") {
+      // If study payment rejected, case goes back to submitted (no payment)
+      newCaseStatus = "submitted";
+    } else if (payment.paymentType === "production_fee") {
+      newCaseStatus = "quote_accepted";
+    }
+
+    // Update payment - FIXED: correct field names
     await prisma.payment.update({
       where: { id: parseInt(id) },
       data: {
         status: "failed",
         rejectionReason: rejectionReason.trim(),
-        verifiedBy: {
-          connect: { id: req.user.designerProfile.id },
-        },
+        verifiedById: req.user.profile.id, // FIXED
         verifiedAt: new Date(),
       },
     });
 
-    let newCaseStatus;
-
-    if (payment.paymentType === "study_fee") {
-      newCaseStatus = "draft";
-    } else if (payment.paymentType === "production_fee") {
-      newCaseStatus = "quote_accepted";
-    }
-
+    // Update case status
     await prisma.case.update({
       where: { id: payment.caseId },
       data: { status: newCaseStatus },
     });
 
+    // Create status history - FIXED: correct field names
     await prisma.caseStatusHistory.create({
       data: {
         caseId: payment.caseId,
         fromStatus: payment.case.status,
         toStatus: newCaseStatus,
         changedBy: "designer",
-        changedById: req.user.designerProfile.id,
+        changedByDesignerId: req.user.profile.id, // FIXED
         notes: `Payment rejected. Reason: ${rejectionReason.trim()}`,
       },
+    });
+
+    // Send notification (email + web)
+    const clientUser = payment.case.clientProfile.user;
+    sendPaymentNotification(
+      clientUser.id,
+      clientUser.email,
+      { ...payment, case: payment.case },
+      false, // isVerified = false (rejected)
+      clientUser.preferredLanguage
+    ).catch((error) => {
+      logger.error("Failed to send payment notification:", {
+        error: error.message,
+        paymentId: payment.id,
+      });
     });
 
     logger.info("Payment rejected:", {
@@ -219,7 +237,7 @@ export const rejectPayment = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Payment rejected. Doctor will need to upload new payment proof",
+      message: "Payment rejected. Client will need to upload new payment proof",
     });
   } catch (error) {
     logger.error("Reject payment error:", {
@@ -231,7 +249,6 @@ export const rejectPayment = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to reject payment",
-      error: error.message,
     });
   }
 };

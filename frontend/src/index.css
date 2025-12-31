@@ -27,6 +27,7 @@
   --animate-fade-in: fade-in 0.6s ease-out forwards;
   --animate-slide-in: slide-in 0.6s ease-out forwards;
   --animate-scale-in: scale-in 0.6s ease-out forwards;
+  --animate-slide-in-right: slide-in-right 0.4s ease-out forwards;
 }
 
 /* Enable dark mode variant */
@@ -67,6 +68,17 @@
   }
 }
 
+@keyframes slide-in-right {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 @keyframes scale-in {
   0% {
     opacity: 0;
@@ -93,48 +105,18 @@ html {
 }
 
 /* ========================================
-   CUSTOM SCROLLBAR
+   HIDE SCROLLBAR COMPLETELY
    ======================================== */
 
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+/* Hide scrollbar for Chrome, Safari and Opera */
+*::-webkit-scrollbar {
+  display: none;
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 10px;
-}
-
-.dark ::-webkit-scrollbar-track {
-  background: #1e293b;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #94a3b8;
-  border-radius: 10px;
-  transition: background 0.3s ease;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: #475569;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
-}
-
+/* Hide scrollbar for IE, Edge and Firefox */
 * {
-  scrollbar-width: thin;
-  scrollbar-color: #94a3b8 #f1f5f9;
-}
-
-.dark * {
-  scrollbar-color: #475569 #1e293b;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 /* ========================================
@@ -169,6 +151,10 @@ body {
 
   .animate-slide-in {
     animation: slide-in 0.6s ease-out forwards;
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 0.4s ease-out forwards;
   }
 
   .animate-scale-in {

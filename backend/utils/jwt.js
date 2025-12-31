@@ -5,14 +5,12 @@ import logger from "../utils/logger.js";
 
 dotenv.config();
 
-export const generateAccessToken = (userId, email, role, profileId) => {
+export const generateAccessToken = (userId, role, profileId) => {
   return jwt.sign(
     {
       userId,
-      email,
       role,
       profileId,
-      type: "access",
     },
     process.env.JWT_SECRET,
     { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || "8h" }
@@ -29,7 +27,6 @@ export const verifyAccessToken = (token) => {
       stack: error.stack,
       function: "verifyAccessToken",
       token: token?.substring(0, 20),
-      userId,
     });
     return null;
   }
@@ -78,12 +75,12 @@ export const isTokenBlacklisted = async (token) => {
       stack: error.stack,
       function: "isTokenBlacklisted",
       token: token?.substring(0, 20),
-      userId,
     });
     return false;
   }
 };
 
+// TODO: Schedule this function to run periodically (e.g., daily) to clean up expired tokens
 export const cleanupExpiredTokens = async () => {
   try {
     const now = new Date();

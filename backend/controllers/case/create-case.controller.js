@@ -30,8 +30,10 @@ export const createCase = async (req, res) => {
       guideType,
       requiredService,
       implantSystem,
+      implantSystemOther,
       teethNumbers,
       clinicalNotes,
+      specialInstructions,
       deliveryMethod,
       deliveryAddressId,
       pickupBranchId,
@@ -52,8 +54,10 @@ export const createCase = async (req, res) => {
         guideType,
         requiredService,
         implantSystem: implantSystem || null,
-        teethNumbers: teethNumbers || null,
+        implantSystemOther: implantSystemOther || null,
+        teethNumbers: teethNumbers ? JSON.stringify(teethNumbers) : null,
         clinicalNotes: clinicalNotes || null,
+        specialInstructions: specialInstructions || null,
         deliveryMethod: deliveryMethod || null,
         deliveryAddressId: deliveryAddressId || null,
         pickupBranchId: pickupBranchId || null,
@@ -77,8 +81,8 @@ export const createCase = async (req, res) => {
         caseId: newCase.id,
         toStatus: "submitted",
         notes: "Case submitted by client",
-        changedByClientId: clientProfileId, // Use client profile ID
-        changedBy: "doctor",
+        changedByClientId: clientProfileId,
+        changedBy: "client", // Fixed: was "doctor"
       },
     });
 

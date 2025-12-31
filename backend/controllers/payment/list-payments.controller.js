@@ -5,7 +5,9 @@ export const listPayments = async (req, res) => {
   try {
     const { caseId, status, paymentType, page = 1, limit = 10 } = req.query;
 
-    const where = {};
+    const where = {
+      deletedAt: null, // FIXED: Add soft delete check
+    };
 
     if (req.user.role === "client") {
       where.clientProfileId = req.user.profile.id;
@@ -65,6 +67,12 @@ export const listPayments = async (req, res) => {
       prisma.payment.count({ where }),
     ]);
 
+    logger.info("Payments listed", {
+      count: payments.length,
+      total,
+      userId: req.user.id,
+    });
+
     res.status(200).json({
       success: true,
       data: {
@@ -83,7 +91,6 @@ export const listPayments = async (req, res) => {
       stack: error.stack,
       controller: "listPayments",
       userId: req.user?.id,
-      caseId: req.params?.id,
     });
     return res.status(500).json({
       success: false,
@@ -125,7 +132,8 @@ export const getPayment = async (req, res) => {
       },
     });
 
-    if (!payment) {
+    if (!payment || payment.deletedAt) {
+      // FIXED: Add soft delete check
       return res.status(404).json({
         success: false,
         message: "Payment not found",
@@ -153,7 +161,7 @@ export const getPayment = async (req, res) => {
       stack: error.stack,
       controller: "getPayment",
       userId: req.user?.id,
-      caseId: req.params?.id,
+      paymentId: req.params?.id,
     });
     return res.status(500).json({
       success: false,

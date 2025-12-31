@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="ltr" class="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
@@ -57,6 +57,16 @@
     />
 
     <style>
+      /* Hide scrollbar globally */
+      * {
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE and Edge */
+      }
+
+      *::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+      }
+
       body {
         margin: 0;
         padding: 0;
@@ -76,13 +86,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #fffbf5;
-        z-index: 9999;
-      }
-
-      .dark .app-loading {
         background: #02172b;
-        background-color: #02172b;
+        z-index: 9999;
       }
 
       .app-loading-logo {
@@ -108,19 +113,23 @@
 
     <script>
       (function () {
-        const theme = localStorage.getItem("theme");
-        const prefersDark = window.matchMedia(
-          "(prefers-color-scheme: dark)"
-        ).matches;
+        // Default to dark mode
+        const theme = localStorage.getItem("theme") || "dark";
 
-        if (theme === "dark" || (!theme && prefersDark)) {
+        if (theme === "dark") {
           document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
         }
 
+        // Default to English
         const language = localStorage.getItem("language") || "en";
         if (language === "ar") {
           document.documentElement.setAttribute("dir", "rtl");
           document.documentElement.setAttribute("lang", "ar");
+        } else {
+          document.documentElement.setAttribute("dir", "ltr");
+          document.documentElement.setAttribute("lang", "en");
         }
       })();
     </script>

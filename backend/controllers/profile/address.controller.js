@@ -13,7 +13,10 @@ export const listAddresses = async (req, res) => {
     }
 
     const addresses = await prisma.address.findMany({
-      where: { clientProfileId: req.user.profile.id },
+      where: {
+        clientProfileId: req.user.profile.id,
+        deletedAt: null, // FIXED: Add soft delete check
+      },
       orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
     });
 
@@ -27,7 +30,6 @@ export const listAddresses = async (req, res) => {
       stack: error.stack,
       controller: "listAddresses",
       userId: req.user?.id,
-      caseId: req.params?.id,
     });
     return res.status(500).json({
       success: false,
@@ -59,8 +61,12 @@ export const addAddress = async (req, res) => {
       isDefault,
     } = req.body;
 
+    // FIXED: Check only non-deleted addresses
     const addressCount = await prisma.address.count({
-      where: { clientProfileId: req.user.profile.id },
+      where: {
+        clientProfileId: req.user.profile.id,
+        deletedAt: null,
+      },
     });
 
     if (addressCount >= MAX_ADDRESSES) {
@@ -77,9 +83,13 @@ export const addAddress = async (req, res) => {
       });
     }
 
+    // If setting as default, clear other defaults
     if (isDefault) {
       await prisma.address.updateMany({
-        where: { clientProfileId: req.user.profile.id },
+        where: {
+          clientProfileId: req.user.profile.id,
+          deletedAt: null, // FIXED: Only update non-deleted addresses
+        },
         data: { isDefault: false },
       });
     }
@@ -101,6 +111,11 @@ export const addAddress = async (req, res) => {
       },
     });
 
+    logger.info("Address added", {
+      userId: req.user.id,
+      addressId: address.id,
+    });
+
     res.status(201).json({
       success: true,
       message: "Address added successfully",
@@ -110,9 +125,8 @@ export const addAddress = async (req, res) => {
     logger.error("Controller error:", {
       error: error.message,
       stack: error.stack,
-      controller: "addaddress",
+      controller: "addAddress",
       userId: req.user?.id,
-      caseId: req.params?.id,
     });
     return res.status(500).json({
       success: false,
@@ -149,6 +163,7 @@ export const updateAddress = async (req, res) => {
       where: {
         id: parseInt(id),
         clientProfileId: req.user.profile.id,
+        deletedAt: null, // FIXED: Check soft delete
       },
     });
 
@@ -159,9 +174,13 @@ export const updateAddress = async (req, res) => {
       });
     }
 
+    // If setting as default, clear other defaults
     if (isDefault) {
       await prisma.address.updateMany({
-        where: { clientProfileId: req.user.profile.id },
+        where: {
+          clientProfileId: req.user.profile.id,
+          deletedAt: null, // FIXED: Only update non-deleted addresses
+        },
         data: { isDefault: false },
       });
     }
@@ -184,6 +203,11 @@ export const updateAddress = async (req, res) => {
       data: updateData,
     });
 
+    logger.info("Address updated", {
+      userId: req.user.id,
+      addressId: updatedAddress.id,
+    });
+
     res.status(200).json({
       success: true,
       message: "Address updated successfully",
@@ -195,7 +219,7 @@ export const updateAddress = async (req, res) => {
       stack: error.stack,
       controller: "updateAddress",
       userId: req.user?.id,
-      caseId: req.params?.id,
+      addressId: req.params?.id,
     });
     return res.status(500).json({
       success: false,
@@ -219,6 +243,7 @@ export const deleteAddress = async (req, res) => {
       where: {
         id: parseInt(id),
         clientProfileId: req.user.profile.id,
+        deletedAt: null, // FIXED: Check soft delete
       },
     });
 
@@ -229,8 +254,15 @@ export const deleteAddress = async (req, res) => {
       });
     }
 
-    await prisma.address.delete({
+    // FIXED: Soft delete instead of hard delete
+    await prisma.address.update({
       where: { id: parseInt(id) },
+      data: { deletedAt: new Date() },
+    });
+
+    logger.info("Address deleted (soft)", {
+      userId: req.user.id,
+      addressId: parseInt(id),
     });
 
     res.status(200).json({
@@ -243,7 +275,7 @@ export const deleteAddress = async (req, res) => {
       stack: error.stack,
       controller: "deleteAddress",
       userId: req.user?.id,
-      caseId: req.params?.id,
+      addressId: req.params?.id,
     });
     return res.status(500).json({
       success: false,
@@ -267,6 +299,7 @@ export const setDefaultAddress = async (req, res) => {
       where: {
         id: parseInt(id),
         clientProfileId: req.user.profile.id,
+        deletedAt: null, // FIXED: Check soft delete
       },
     });
 
@@ -277,14 +310,24 @@ export const setDefaultAddress = async (req, res) => {
       });
     }
 
+    // Clear all defaults
     await prisma.address.updateMany({
-      where: { clientProfileId: req.user.profile.id },
+      where: {
+        clientProfileId: req.user.profile.id,
+        deletedAt: null, // FIXED: Only update non-deleted addresses
+      },
       data: { isDefault: false },
     });
 
+    // Set new default
     await prisma.address.update({
       where: { id: parseInt(id) },
       data: { isDefault: true },
+    });
+
+    logger.info("Default address set", {
+      userId: req.user.id,
+      addressId: parseInt(id),
     });
 
     res.status(200).json({
@@ -297,7 +340,7 @@ export const setDefaultAddress = async (req, res) => {
       stack: error.stack,
       controller: "setDefaultAddress",
       userId: req.user?.id,
-      caseId: req.params?.id,
+      addressId: req.params?.id,
     });
     return res.status(500).json({
       success: false,

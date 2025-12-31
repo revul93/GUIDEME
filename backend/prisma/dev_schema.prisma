@@ -48,6 +48,7 @@ enum AccountStatus {
   active
   suspended
   deleted
+  pending_approval
 }
 
 enum FailedLoginReason {
@@ -162,6 +163,41 @@ enum PaymentType {
   production_fee
   delivery_fee
 }
+
+enum NotificationType {
+  email
+  whatsapp
+  web
+}
+
+enum NotificationPurpose {
+  otp
+  welcome
+  case_update
+  case_submitted
+  comment_added
+  payment_reminder
+  payment_verified
+  payment_rejected
+  quote_sent
+  quote_accepted
+  quote_rejected
+  status_changed
+  refund_requested
+  refund_processed
+  general_announcement
+}
+
+enum DiscountType {
+  percentage
+  fixed
+}
+
+enum Language {
+  en
+  ar
+}
+
 // ===================================================================
 // CORE USER & PROFILE MODELS
 // ===================================================================
@@ -188,25 +224,36 @@ model User {
   lockedAt            DateTime?
   lockedUntil         DateTime?
   lockReason          String?
+  UnlockedAt          DateTime?
+
+  // User preferences
+  preferredLanguage   Language  @default(en)
+  timezone            String    @default("Asia/Riyadh")
+  
+  // Notification preferences
+  notificationPreferences Json? // { email: true, whatsapp: false, web: true }
 
   // Timestamps
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  lastLoginAt DateTime?
-  deletedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+  deletedAt     DateTime?
+  approvedAt    DateTime?
+  suspendedAt   DateTime?
+  ReactivatedAt DateTime?
 
-  // Relations - Authentication
-  otpCodes     OtpCode[]
-  loginHistory LoginHistory[]
-
-  // Relations - Profiles (one-to-one)
-  clientProfile   ClientProfile?
-  designerProfile DesignerProfile?
+  // Relations
+  otpCodes         OtpCode[]
+  loginHistory     LoginHistory[]
+  clientProfile    ClientProfile?
+  designerProfile  DesignerProfile?
+  notificationLogs NotificationLog[]
 
   @@index([email])
   @@index([phoneNumber])
   @@index([role])
   @@index([accountStatus])
+  @@index([deletedAt])
 }
 
 model ClientProfile {
@@ -217,25 +264,27 @@ model ClientProfile {
   clientType ClientType
   name       String
 
-  // Professional info (mainly for doctors)
+  profileImageUrl String?
+
   specialty      DentalSpecialty?
   specialtyOther String?
 
-  // Organization info
-  clinicName String? // For doctors
-  labName    String? // For labs
+  clinicName String?
+  labName    String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  // Relations
   caseStatusUpdates CaseStatusHistory[]
-  addresses    Address[]
-  cases        Case[]
-  caseComments CaseComment[]
-  payments     Payment[]
+  addresses         Address[]
+  cases             Case[]
+  caseComments      CaseComment[]
+  payments          Payment[]
+  discountUsages DiscountUsage[]
 
   @@index([clientType])
+  @@index([deletedAt])
 }
 
 model DesignerProfile {
@@ -243,7 +292,8 @@ model DesignerProfile {
   userId Int  @unique
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  name String
+  name            String
+  profileImageUrl String?
 
   // Designer info
   specialization  String?
@@ -251,10 +301,11 @@ model DesignerProfile {
   bio             String?
 
   // Admin & Permissions
-  isAdmin          Boolean @default(false)
+  isAdmin Boolean @default(false)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   // Relations
   caseStatusUpdates CaseStatusHistory[]
@@ -262,8 +313,10 @@ model DesignerProfile {
   studiesCompleted  Case[]              @relation("StudyCompletedBy")
   quotesCreated     CaseQuote[]         @relation("QuoteCreatedBy")
   paymentsVerified  Payment[]           @relation("PaymentVerifiedBy")
-
+  discountCodes DiscountCode[]
+  
   @@index([isAdmin])
+  @@index([deletedAt])
 }
 
 model Address {
@@ -273,7 +326,6 @@ model Address {
 
   label String?
 
-  // Address fields
   country    String
   city       String
   district   String?
@@ -281,20 +333,20 @@ model Address {
   building   String?
   postalCode String?
 
-  // Google Maps (optional)
   latitude  Float?
   longitude Float?
   placeId   String?
 
   isDefault Boolean @default(false)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  // Relations
   casesForDelivery Case[]
 
   @@index([clientProfileId, isDefault])
+  @@index([deletedAt])
 }
 
 // ===================================================================
@@ -307,7 +359,7 @@ model OtpCode {
   userId Int?
   user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  identifier String // email or phone number
+  identifier String
   code       String
   channel    OtpChannel
   purpose    OtpPurpose
@@ -330,7 +382,6 @@ model LoginHistory {
   userId Int
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Login details
   ipAddress  String?
   userAgent  String?
   location   String?
@@ -357,19 +408,73 @@ model TokenBlacklist {
 }
 
 // ===================================================================
+// NOTIFICATION SYSTEM
+// ===================================================================
+
+model NotificationLog {
+  id  Int   @id   @default(autoincrement())
+
+  userId  Int?
+  user    User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Notification details
+  type    NotificationType
+  purpose NotificationPurpose
+  
+  recipient String // email, phone, or userId for web
+  
+  // Template and content
+  templateUsed String?
+  language     Language  @default(en)
+  subject      String? 
+
+  // Web notification specific
+  title     String?
+  body      String?
+  actionUrl String?
+  
+  // Delivery status
+  sent   Boolean   @default(false)
+  sentAt DateTime?
+  
+  // Read status
+  isRead Boolean   @default(false)
+  readAt DateTime?
+  
+  // Error tracking
+  error     String?
+  errorCode String?
+  
+  // External service tracking
+  messageId String?
+  
+  // Metadata
+  metadata Json?
+  
+  createdAt DateTime @default(now())
+
+  @@index([userId, type, createdAt])
+  @@index([userId, purpose, createdAt])
+  @@index([userId, isRead, createdAt]) // NEW - for unread queries
+  @@index([sent, createdAt])
+  @@index([createdAt])
+}
+
+// ===================================================================
 // CASE MANAGEMENT
 // ===================================================================
 
+// FIXED: Changed onDelete to Cascade (clientProfileId stays non-null)
 model Case {
   id         Int    @id @default(autoincrement())
   caseNumber String @unique
 
-  // Client info (can be doctor or lab)
+  // Client info - FIXED relation
   clientProfileId Int
   clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
 
   // Patient info
-  patientRef     String? // Optional patient reference  
+  patientRef String?
 
   // Procedure details
   procedureCategory ProcedureCategory
@@ -379,7 +484,7 @@ model Case {
   // Clinical details
   implantSystem      ImplantSystem?
   implantSystemOther String?
-  teethNumbers       String? // JSON array or comma-separated
+  teethNumbers       String?
 
   // Case description
   clinicalNotes       String?
@@ -389,18 +494,20 @@ model Case {
   status      CaseStatus
   submittedAt DateTime?
 
+  discountUsages DiscountUsage[]
+
   // Study tracking
   studyCompletedAt   DateTime?
   studyCompletedById Int?
   studyCompletedBy   DesignerProfile? @relation("StudyCompletedBy", fields: [studyCompletedById], references: [id])
 
   // Delivery info
-  deliveryMethod        DeliveryMethod?
-  deliveryAddressId     Int?
-  deliveryAddress       Address?        @relation(fields: [deliveryAddressId], references: [id])
-  pickupBranchId        Int?
-  pickupBranch          Branch?         @relation(fields: [pickupBranchId], references: [id])
-  actualDeliveryDate    DateTime?
+  deliveryMethod     DeliveryMethod?
+  deliveryAddressId  Int?
+  deliveryAddress    Address?        @relation(fields: [deliveryAddressId], references: [id])
+  pickupBranchId     Int?
+  pickupBranch       Branch?         @relation(fields: [pickupBranchId], references: [id])
+  actualDeliveryDate DateTime?
 
   // Timestamps
   createdAt          DateTime  @default(now())
@@ -408,6 +515,7 @@ model Case {
   completedAt        DateTime?
   cancelledAt        DateTime?
   cancellationReason String?
+  deletedAt          DateTime?
 
   // Relations
   files         CaseFile[]
@@ -419,6 +527,7 @@ model Case {
   @@index([clientProfileId, status])
   @@index([caseNumber])
   @@index([status, createdAt])
+  @@index([deletedAt])
 }
 
 model CaseFile {
@@ -428,17 +537,19 @@ model CaseFile {
 
   fileName String
   fileUrl  String
-  fileType String // MIME type
-  fileSize Int // bytes
+  fileType String
+  fileSize Int
   category FileCategory @default(other)
 
   description  String?
-  uploadedBy   String // "client" or "designer"
-  uploadedById Int? // profileId (clientProfileId or designerProfileId)
+  uploadedBy   String
+  uploadedById Int?
 
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
 
   @@index([caseId, category])
+  @@index([deletedAt])
 }
 
 model CaseComment {
@@ -446,8 +557,7 @@ model CaseComment {
   caseId Int
   case   Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
-  // Author (either client or designer)
-  authorType        String // "client" or "designer"
+  authorType        UserRole
   clientProfileId   Int?
   clientProfile     ClientProfile?   @relation(fields: [clientProfileId], references: [id])
   designerProfileId Int?
@@ -455,17 +565,18 @@ model CaseComment {
 
   comment String
 
-  // Optional: attach files to comments
-  attachments String? // JSON array of file URLs
+  attachments String?
 
   isRead Boolean   @default(false)
   readAt DateTime?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@index([caseId, createdAt])
   @@index([caseId, isRead])
+  @@index([deletedAt])
 }
 
 model CaseStatusHistory {
@@ -476,12 +587,10 @@ model CaseStatusHistory {
   fromStatus CaseStatus?
   toStatus   CaseStatus
 
-  // Separate fields for client vs designer changes
-  changedByClientId    Int?
-  changedByDesignerId  Int?
-  changedBy            String  // "client", "designer", "admin", "system"
-  
-  // Relations - one will be set based on who made the change
+  changedByClientId   Int?
+  changedByDesignerId Int?
+  changedBy           UserRole
+
   client   ClientProfile?   @relation(fields: [changedByClientId], references: [id])
   designer DesignerProfile? @relation(fields: [changedByDesignerId], references: [id])
 
@@ -503,7 +612,6 @@ model CaseQuote {
   caseId Int
   case   Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
-  // Pricing (SAR)
   studyFee      Float @default(100)
   designFee     Float @default(0)
   productionFee Float @default(0)
@@ -513,11 +621,15 @@ model CaseQuote {
   discountAmount Float   @default(0)
   discountReason String?
 
-  vatRate     Float @default(15) // percentage
+  discountCodeId    Int?
+  discountCode      DiscountCode? @relation(fields: [discountCodeId], references: [id])
+  discountUsages    DiscountUsage[]
+
+
+  vatRate     Float @default(15)
   vatAmount   Float
   totalAmount Float
 
-  // Status
   isSent Boolean   @default(false)
   sentAt DateTime?
 
@@ -530,27 +642,28 @@ model CaseQuote {
 
   validUntil DateTime?
 
-  // Created by designer
+  internalNotes String?
+  notes         String?
+
   createdById Int
   createdBy   DesignerProfile @relation("QuoteCreatedBy", fields: [createdById], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  // Relations
   payments Payment[]
 
   @@index([caseId])
   @@index([quoteNumber])
   @@index([createdById])
+  @@index([deletedAt])
 }
-
 
 model Payment {
   id            Int    @id @default(autoincrement())
   paymentNumber String @unique
 
-  // Links
   caseId Int
   case   Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
@@ -560,7 +673,6 @@ model Payment {
   clientProfileId Int
   clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id])
 
-  // Payment details
   paymentType PaymentType
   amount      Float
   currency    String      @default("SAR")
@@ -568,47 +680,112 @@ model Payment {
   paymentMethod PaymentMethod
   status        PaymentStatus @default(pending)
 
-  // Payment proof (for bank transfer)
   proofUrl        String?
   proofUploadedAt DateTime?
 
-  // HyperPay integration
   hyperPayCheckoutId   String?
   hyperPayResourcePath String?
 
-  // Card details (last 4 digits only)
   cardLast4 String?
   cardBrand String?
 
-  // Transaction tracking
   transactionId   String?
   transactionDate DateTime?
 
-  // Verification (by designer/admin)
   isVerified      Boolean          @default(false)
   verifiedById    Int?
   verifiedBy      DesignerProfile? @relation("PaymentVerifiedBy", fields: [verifiedById], references: [id])
   verifiedAt      DateTime?
   rejectionReason String?
 
-  // Refund
   isRefunded     Boolean   @default(false)
   refundedAmount Float?
   refundedAt     DateTime?
   refundReason   String?
 
-  // Metadata
+  refundRequestedAt DateTime?
+  refundNotes       String?
+
   notes     String?
   ipAddress String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@index([caseId, status])
   @@index([clientProfileId])
   @@index([paymentType, status])
   @@index([transactionId])
   @@index([verifiedById])
+  @@index([deletedAt])
+}
+
+model DiscountCode {
+  id                Int      @id @default(autoincrement())
+  code              String   @unique
+  
+  // Discount configuration
+  discountType      DiscountType
+  discountValue     Float
+  maxDiscountAmount Float?
+  
+  // Conditions
+  minOrderAmount    Float    @default(0)
+  maxUsesTotal      Int?
+  maxUsesPerClient  Int?
+  
+  // Validity
+  validFrom         DateTime
+  validUntil        DateTime
+  isActive          Boolean  @default(true)
+  
+  // Usage tracking
+  timesUsed         Int      @default(0)
+  
+  // Metadata
+  description       String?
+  internalNotes     String?
+  createdByAdminId  Int
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  deletedAt         DateTime?
+  
+  // Relations
+  createdBy         DesignerProfile @relation(fields: [createdByAdminId], references: [id])
+  quotes            CaseQuote[]
+  usages            DiscountUsage[]
+  
+  @@index([code, isActive])
+  @@index([validFrom, validUntil])
+  @@index([deletedAt])
+}
+
+model DiscountUsage {
+  id              Int      @id @default(autoincrement())
+  
+  discountCodeId  Int
+  discountCode    DiscountCode @relation(fields: [discountCodeId], references: [id])
+  
+  clientProfileId Int
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id])
+  
+  caseId          Int
+  case            Case @relation(fields: [caseId], references: [id])
+  
+  quoteId         Int
+  quote           CaseQuote @relation(fields: [quoteId], references: [id])
+  
+  // Discount calculation
+  originalAmount  Float
+  discountAmount  Float
+  finalAmount     Float
+  
+  appliedAt       DateTime @default(now())
+  
+  @@index([discountCodeId, clientProfileId])
+  @@index([caseId])
+  @@index([quoteId])
 }
 
 // ===================================================================
@@ -628,19 +805,20 @@ model ServiceCatalog {
   description   String?
   descriptionAr String?
 
-  // Pricing
   studyFee          Float  @default(100)
   baseDesignFee     Float  @default(0)
   baseProductionFee Float  @default(0)
-  perToothFee       Float? // Additional fee per tooth
+  perToothFee       Float?
 
   isActive Boolean @default(true)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@unique([procedureCategory, guideType, requiredService])
   @@index([isActive])
+  @@index([deletedAt])
 }
 
 model Branch {
@@ -648,27 +826,25 @@ model Branch {
   name   String
   nameAr String?
 
-  // Address
   city     String
   district String?
   street   String
   phone    String?
   email    String?
 
-  // Google Maps
   latitude  Float?
   longitude Float?
 
-  // Working hours
-  workingHours String? // JSON or formatted string
+  workingHours String?
 
   isActive Boolean @default(true)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  // Relations
   casesForPickup Case[]
 
   @@index([isActive])
+  @@index([deletedAt])
 }

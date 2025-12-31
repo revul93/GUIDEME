@@ -7,9 +7,14 @@ export const listQuotes = async (req, res) => {
 
     const caseData = await prisma.case.findUnique({
       where: { id: parseInt(id) },
+      select: {
+        id: true,
+        clientProfileId: true,
+        deletedAt: true,
+      },
     });
 
-    if (!caseData) {
+    if (!caseData || caseData.deletedAt) {
       return res.status(404).json({
         success: false,
         message: "Case not found",
@@ -26,7 +31,10 @@ export const listQuotes = async (req, res) => {
     }
 
     const quotes = await prisma.caseQuote.findMany({
-      where: { caseId: parseInt(id) },
+      where: {
+        caseId: parseInt(id),
+        deletedAt: null, // FIXED: Add soft delete check
+      },
       include: {
         createdBy: {
           select: {
@@ -36,6 +44,12 @@ export const listQuotes = async (req, res) => {
         },
       },
       orderBy: { createdAt: "desc" },
+    });
+
+    logger.info("Quotes listed", {
+      caseId: parseInt(id),
+      count: quotes.length,
+      userId: req.user.id,
     });
 
     res.status(200).json({
@@ -49,7 +63,7 @@ export const listQuotes = async (req, res) => {
     logger.error("Controller error:", {
       error: error.message,
       stack: error.stack,
-      controller: "list quotes",
+      controller: "listQuotes",
       userId: req.user?.id,
       caseId: req.params?.id,
     });
@@ -84,12 +98,16 @@ export const getQuote = async (req, res) => {
           },
         },
         payments: {
+          where: {
+            deletedAt: null, // FIXED: Add soft delete check for payments
+          },
           orderBy: { createdAt: "desc" },
         },
       },
     });
 
-    if (!quote) {
+    if (!quote || quote.deletedAt) {
+      // FIXED: Add soft delete check
       return res.status(404).json({
         success: false,
         message: "Quote not found",
@@ -117,7 +135,7 @@ export const getQuote = async (req, res) => {
       stack: error.stack,
       controller: "getQuote",
       userId: req.user?.id,
-      caseId: req.params?.id,
+      quoteId: req.params?.id,
     });
     return res.status(500).json({
       success: false,

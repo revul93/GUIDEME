@@ -23,7 +23,7 @@
   },
   "hero": {
     "title": "Your Partner in Guided Dental Surgery",
-    "subtitle": "Designed by specialists for specialists.",
+    "subtitle": "Designed by specialists for specialists",
     "cta": "Know More",
     "stats": {
       "cases": "Cases Completed",
@@ -33,6 +33,8 @@
   },
   "whoWeAre": {
     "title": "Who We Are",
+    "p1": "GuideMe is a cloud-based digital dental laboratory, built and led by specialized dental clinicians. Operating at the intersection of clinical science and advanced digital engineering, we deliver precision-driven solutions in implant dentistry and comprehensive laboratory services.",
+    "p2": "Our work focuses on high-accuracy surgical guides, implant-supported titanium bars, and digitally planned workflows designed to support predictable, prosthetically driven outcomes.",
     "cloud": {
       "title": "Cloud-Based Digital Lab",
       "text": "A cloud-based digital dental laboratory, built and led by specialized dental clinicians."
@@ -44,24 +46,27 @@
     "outcomes": {
       "title": "Predictable Outcomes",
       "text": "High-accuracy surgical guides and digitally planned workflows designed for prosthetically driven results."
-    },
-    "statement": "We deliver precision-driven solutions in implant dentistry and comprehensive laboratory services, focusing on predictable outcomes."
+    }
   },
   "howWeWork": {
     "title": "How We Work",
     "subtitle": "A streamlined process to ensure precision and efficiency in every case",
     "steps": {
       "step1": {
-        "title": "Submit Case",
-        "description": "Upload case details, clinical notes and case documents"
+        "title": "Scan. Upload. Approve",
+        "description": "Your case data is submitted and ready for digital planning"
       },
       "step2": {
-        "title": "Digital Planning",
-        "description": "Our expert team creates a detailed surgical study guide"
+        "title": "Digital Planning by Specialists",
+        "description": "Surgical and prosthetic planning designed for accuracy and predictability"
       },
       "step3": {
-        "title": "Delivery & Support",
-        "description": "Receive your guides with ongoing support from our specialists"
+        "title": "Precision Manufacturing",
+        "description": "Your guides or prosthetics are produced using advanced digital technologies"
+      },
+      "step4": {
+        "title": "Delivered with Ongoing Support",
+        "description": "On-time delivery with continuous clinical support when you need it"
       }
     }
   },
@@ -101,37 +106,87 @@
   "services": {
     "title": "Our Services",
     "subtitle": "Comprehensive digital dental solutions designed for precision and excellence.",
-    "surgical": {
-      "title": "Surgical Guides",
-      "description": "High-precision 3D printed surgical guides for implant placement."
+    "digitalSurgical": {
+      "title": "Digital Surgical Solutions",
+      "description": "Comprehensive digital surgical guide services for precise implant placement",
+      "items": {
+        "fullyDigitalGuides": "Fully Digital Surgical Guides",
+        "toothSupported": "Tooth-Supported Guides",
+        "tissueSupported": "Tissue-Supported Guides",
+        "boneSupported": "Bone-Supported Guides",
+        "stackableGuides": "Stackable Guides",
+        "pilotDrill": "Pilot Drill Guides",
+        "fullyGuided": "Fully Guided Surgery",
+        "sinusLift": "Sinus Lift Guides",
+        "endoGuides": "Endo Guides",
+        "apicoectomy": "Apicoectomy Guides",
+        "gingivectomy": "Gingivectomy Guides",
+        "boneReduction": "Bone Reduction Guides",
+        "cbctIntegration": "CBCT + Intraoral Scan Integration",
+        "prostheticallyDriven": "Prosthetically Driven Planning",
+        "multiUnitSupport": "Multi-Unit Support",
+        "predictablePlacement": "Predictable Implant Placement",
+        "fullArchGuided": "Full Arch Guided Solutions",
+        "allOnX": "All-on-4 / All-on-6 / All-on-X",
+        "immediateLoading": "Immediate Loading Workflows"
+      }
     },
-    "studyDesign": {
-      "title": "Study & Design",
-      "description": "Comprehensive digital treatment planning and surgical study services.",
-      "feature1": "Digital Implant Planning",
-      "feature2": "3D Visualization",
-      "feature3": "Prosthetic-Driven Design"
+    "prosthetic": {
+      "title": "Digital Prosthetic Solutions",
+      "description": "Premium prosthetic components and full arch solutions",
+      "items": {
+        "precisionTitanium": "Precision Titanium Bars",
+        "screwRetained": "Screw-Retained Systems",
+        "passiveFit": "Passive Fit (Digitally Verified)",
+        "stackableWorkflow": "Stackable Guided Workflow",
+        "fullArchProsthetics": "Full Arch Prosthetics",
+        "allOnBars": "All-on-4 / All-on-6 Bars",
+        "hybridDentures": "Hybrid Dentures",
+        "pmmaPrototypes": "PMMA Prototypes",
+        "finalProstheses": "Final Prostheses",
+        "customComponents": "Custom Components",
+        "customAbutments": "Custom Abutments",
+        "multiUnitDesigns": "Multi-Unit Compatible Designs"
+      }
     },
-    "production": {
-      "title": "Production & Manufacturing",
-      "description": "State-of-the-art 3D printing and manufacturing of dental surgical guides.",
-      "feature1": "High-Precision 3D Printing",
-      "feature2": "Quality Assurance",
-      "feature3": "Fast Turnaround Times"
+    "manufacturing": {
+      "title": "Advanced Manufacturing & Printing",
+      "description": "State-of-the-art manufacturing with quality assurance",
+      "items": {
+        "highPrecision3d": "High-Precision 3D Printing",
+        "surgicalResin": "Surgical Resin Printing",
+        "temporaryResin": "Temporary Resin Solutions",
+        "millingMetal": "Milling & Metal Manufacturing",
+        "titaniumMilled": "Titanium (Milled)",
+        "pmmaManufacturing": "PMMA Manufacturing",
+        "slmTechnology": "SLM Technology",
+        "qualityAssurance": "Quality Assurance Protocols",
+        "fastTurnaround": "Fast Turnaround Times",
+        "clinicalValidation": "Clinical Accuracy Validation"
+      }
     },
-    "fullArch": {
-      "title": "Full Arch Solutions",
-      "description": "All-on-4/6 planning and guided surgery for complete arch restorations.",
-      "feature1": "Comprehensive Planning",
-      "feature2": "Multi-Unit Support",
-      "feature3": "Prosthetically Driven Outcomes"
+    "planning": {
+      "title": "Digital Planning & Design Services",
+      "description": "Expert case planning and visualization services",
+      "items": {
+        "digitalImplant": "Digital Implant Planning",
+        "caseVisualization": "3D Case Visualization",
+        "prostheticallyDriven": "Prosthetic-Driven Design",
+        "fullArchPlanning": "Full Arch Planning",
+        "smileDesign": "Smile Design",
+        "comprehensiveStudy": "Comprehensive Case Study & Planning"
+      }
     },
-    "gbr": {
-      "title": "GBR Planning",
-      "description": "Guided Bone Regeneration planning and membrane placement services.",
-      "feature1": "Bone Augmentation Planning",
-      "feature2": "Membrane Design",
-      "feature3": "Precise Surgical Execution"
+    "supply": {
+      "title": "Implant Systems & Accessories Supply",
+      "description": "Complete range of implant systems and surgical accessories",
+      "items": {
+        "dentalImplants": "Dental Implant Systems",
+        "surgicalKits": "Surgical Kits & Drills",
+        "multiUnitAbutments": "Multi-Unit Abutments",
+        "screwsDrivers": "Screws, Drivers & Prosthetic Components",
+        "guidedAccessories": "Guided Surgery Accessories"
+      }
     }
   },
   "team": {
@@ -213,7 +268,7 @@
       "phoneHint": "Enter 9 digits starting with 5",
       "specialty": "Specialty",
       "specialtyOther": "Specify your specialty",
-      "clinicName": "Clinic/Practice Name",
+      "clinicName": "Clinic Name",
       "otp": "Verification Code"
     },
     "specialties": {

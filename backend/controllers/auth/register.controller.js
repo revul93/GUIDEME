@@ -1,5 +1,7 @@
 import prisma from "../../config/db.js";
 import { generateAccessToken } from "../../utils/jwt.js";
+import { sendWelcomeNotification } from "../../services/notification.service.js";
+import logger from "../../utils/logger.js";
 
 export const handleRegister = async (req, data) => {
   const {
@@ -31,6 +33,11 @@ export const handleRegister = async (req, data) => {
 
   if (!phoneNumber) {
     errors.push("Phone number is required");
+  } else {
+    const phoneRegex = /^\+?[1-9]\d{1,14}$/; // E.164 format
+    if (!phoneRegex.test(phoneNumber)) {
+      errors.push("Invalid phone number format");
+    }
   }
 
   const validSpecialties = [
@@ -64,58 +71,90 @@ export const handleRegister = async (req, data) => {
     };
   }
 
-  const user = await prisma.user.create({
-    data: {
+  try {
+    const user = await prisma.user.create({
+      data: {
+        email,
+        phoneNumber,
+        role: "client",
+        emailVerified: channel === "email",
+        phoneVerified: channel === "whatsapp",
+        accountStatus: "active",
+        preferredLanguage: "en",
+        timezone: "Asia/Riyadh",
+        notificationPreferences: {
+          email: true,
+          whatsapp: false,
+          web: true,
+        },
+      },
+    });
+
+    const profile = await prisma.clientProfile.create({
+      data: {
+        userId: user.id,
+        clientType: "doctor",
+        name: name.trim(),
+        specialty,
+        specialtyOther,
+        clinicName,
+      },
+    });
+
+    const accessToken = generateAccessToken(user.id, user.role, profile.id);
+
+    await prisma.loginHistory.create({
+      data: {
+        userId: user.id,
+        ipAddress: req.ip,
+        userAgent: req.headers["user-agent"],
+        success: true,
+      },
+    });
+
+    sendWelcomeNotification(
+      user.id,
+      user.email,
+      profile.name,
+      user.preferredLanguage
+    ).catch((error) => {
+      logger.error("Failed to send welcome notification:", {
+        error: error.message,
+        userId: user.id,
+        email: user.email,
+      });
+    });
+
+    return {
+      success: true,
+      statusCode: 201,
+      message: "Registration successful",
+      data: {
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          emailVerified: user.emailVerified,
+          phoneVerified: user.phoneVerified,
+          preferredLanguage: user.preferredLanguage,
+          profile,
+        },
+        accessToken,
+      },
+    };
+  } catch (error) {
+    logger.error("Registration error:", {
+      error: error.message,
+      stack: error.stack,
       email,
       phoneNumber,
-      role: "client",
-      emailVerified: channel === "email",
-      phoneVerified: channel === "whatsapp",
-      accountStatus: "active",
-    },
-  });
+    });
 
-  const profile = await prisma.clientProfile.create({
-    data: {
-      userId: user.id,
-      clientType: "doctor",
-      name: name.trim(),
-      specialty,
-      specialtyOther,
-      clinicName,
-    },
-  });
-
-  const accessToken = generateAccessToken(
-    user.id,
-    user.email,
-    user.role,
-    profile.id
-  );
-
-  await prisma.loginHistory.create({
-    data: {
-      userId: user.id,
-      ipAddress: req.ip,
-      userAgent: req.headers["user-agent"],
-      success: true,
-    },
-  });
-
-  return {
-    success: true,
-    statusCode: 201,
-    message: "Registration successful",
-    data: {
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        emailVerified: user.emailVerified,
-        phoneVerified: user.phoneVerified,
-        profile,
-      },
-      accessToken,
-    },
-  };
+    return {
+      success: false,
+      statusCode: 500,
+      message: "Registration failed",
+      errors: ["An error occurred during registration. Please try again."],
+    };
+  }
 };

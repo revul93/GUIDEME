@@ -16,7 +16,8 @@ export const ThemeProvider = ({ children }) => {
     if (saved) {
       return saved === "dark";
     }
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    // DEFAULT TO DARK MODE
+    return true;
   });
 
   useEffect(() => {

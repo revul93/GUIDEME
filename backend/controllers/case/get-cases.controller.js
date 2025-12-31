@@ -11,6 +11,7 @@ export const getCases = async (req, res) => {
       status,
       procedureCategory,
       search,
+      clientId, // For designers to filter by specific client
     } = req.query;
 
     const pageNum = parseInt(page);
@@ -18,52 +19,64 @@ export const getCases = async (req, res) => {
     const skip = (pageNum - 1) * limitNum;
 
     // Build where clause
-    const whereClause = {};
+    const where = {
+      deletedAt: null, // Exclude soft-deleted cases
+    };
 
-    // Filter by client if user is a client
+    // Clients only see their own cases
     if (req.user.role === "client") {
-      whereClause.clientProfileId = req.user.profile.id;
+      where.clientProfileId = req.user.profile.id;
+    }
+
+    // Designers can optionally filter by client
+    if (req.user.role === "designer" && clientId) {
+      where.clientProfileId = parseInt(clientId);
     }
 
     // Filter by status
     if (status) {
-      whereClause.status = status;
+      where.status = status;
     }
 
     // Filter by procedure category
     if (procedureCategory) {
-      whereClause.procedureCategory = procedureCategory;
+      where.procedureCategory = procedureCategory;
     }
 
-    // Search by case number or patient ref
+    // Search by case number or patient ref (useful for designers)
     if (search) {
-      whereClause.OR = [
+      where.OR = [
         { caseNumber: { contains: search, mode: "insensitive" } },
         { patientRef: { contains: search, mode: "insensitive" } },
       ];
     }
 
     // Get total count
-    const total = await prisma.case.count({ where: whereClause });
+    const total = await prisma.case.count({ where });
+
+    // Build include based on role
+    const include = {
+      clientProfile: {
+        select: {
+          id: true,
+          name: true,
+          clientType: true,
+        },
+      },
+      _count: {
+        select: {
+          files: true,
+          comments: true,
+          // Only clients need quote count in their dashboard
+          ...(req.user.role === "client" && { quotes: true }),
+        },
+      },
+    };
 
     // Get cases
     const cases = await prisma.case.findMany({
-      where: whereClause,
-      include: {
-        clientProfile: {
-          select: {
-            id: true,
-            name: true,
-            clientType: true,
-          },
-        },
-        _count: {
-          select: {
-            files: true,
-            comments: true,
-          },
-        },
-      },
+      where,
+      include,
       orderBy: { [sortBy]: sortOrder },
       skip,
       take: limitNum,
@@ -74,6 +87,7 @@ export const getCases = async (req, res) => {
       total,
       page: pageNum,
       userId: req.user.id,
+      role: req.user.role,
     });
 
     res.json({

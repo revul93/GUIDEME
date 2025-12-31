@@ -1,9 +1,10 @@
 import prisma from "../../config/db.js";
 import logger from "../../utils/logger.js";
+import { createWebNotification } from "../../services/notification.service.js";
 
 export const createQuote = async (req, res) => {
   try {
-    if (req.user.role !== "designer" || !req.user.designerProfile?.isAdmin) {
+    if (req.user.role !== "designer" || !req.user.profile.isAdmin) {
       return res.status(403).json({
         success: false,
         message: "Only admins can create quotes",
@@ -19,8 +20,8 @@ export const createQuote = async (req, res) => {
       discountAmount = 0,
       discountReason,
       vatRate = 15,
-      internalNotes,
-      notes,
+      internalNotes, // Admin-only notes
+      notes, // Client-facing notes
       validUntil,
     } = req.body;
 
@@ -33,9 +34,16 @@ export const createQuote = async (req, res) => {
 
     const caseData = await prisma.case.findUnique({
       where: { id: caseId },
+      include: {
+        clientProfile: {
+          include: {
+            user: true,
+          },
+        },
+      },
     });
 
-    if (!caseData) {
+    if (!caseData || caseData.deletedAt) {
       return res.status(404).json({
         success: false,
         message: "Case not found",
@@ -76,7 +84,7 @@ export const createQuote = async (req, res) => {
         validUntil: validUntil ? new Date(validUntil) : defaultValidUntil,
         internalNotes,
         notes,
-        createdById: req.user.designerProfile.id,
+        createdById: req.user.profile.id,
         isSent: true,
         sentAt: new Date(),
       },
@@ -100,20 +108,53 @@ export const createQuote = async (req, res) => {
       },
     });
 
+    // Update case status
     await prisma.case.update({
       where: { id: caseId },
       data: { status: "quote_sent" },
     });
 
+    // Create status history - FIXED: correct field names
     await prisma.caseStatusHistory.create({
       data: {
         caseId,
         fromStatus: "study_completed",
         toStatus: "quote_sent",
         changedBy: "designer",
-        changedById: req.user.designerProfile.id,
+        changedByDesignerId: req.user.profile.id, // FIXED
         notes: "Quote created and sent",
       },
+    });
+
+    // Send notification to client (email + web)
+    const clientUser = caseData.clientProfile.user;
+
+    createWebNotification({
+      userId: clientUser.id,
+      purpose: "quote_sent",
+      title:
+        clientUser.preferredLanguage === "ar"
+          ? `عرض أسعار جديد - ${caseData.caseNumber}`
+          : `New Quote - ${caseData.caseNumber}`,
+      body:
+        clientUser.preferredLanguage === "ar"
+          ? `تم إرسال عرض أسعار بمبلغ ${totalAmount.toFixed(2)} ريال`
+          : `Quote sent for SAR ${totalAmount.toFixed(2)}`,
+      actionUrl: `/cases/${caseId}/quotes/${quote.id}`,
+      metadata: { quoteId: quote.id, caseId, totalAmount },
+      language: clientUser.preferredLanguage,
+    }).catch((error) => {
+      logger.error("Failed to send notification:", {
+        error: error.message,
+        quoteId: quote.id,
+      });
+    });
+
+    logger.info("Quote created", {
+      quoteId: quote.id,
+      caseId,
+      totalAmount,
+      createdBy: req.user.profile.id,
     });
 
     res.status(201).json({
@@ -129,7 +170,6 @@ export const createQuote = async (req, res) => {
       stack: error.stack,
       controller: "createQuote",
       userId: req.user?.id,
-      caseId: req.params?.id,
     });
     return res.status(500).json({
       success: false,

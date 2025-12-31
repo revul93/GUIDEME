@@ -4,7 +4,7 @@ import {
   createOtpRecord,
   verifyOtp,
 } from "../../services/otp.service.js";
-import { sendOtp, isChannelConfigured } from "../../services/twilio.service.js";
+import { sendOtpNotification } from "../../services/notification.service.js";
 import logger from "../../utils/logger.js";
 
 export const requestContactChange = async (req, res) => {
@@ -86,22 +86,6 @@ export const requestContactChange = async (req, res) => {
 
     const channel = contactType === "email" ? "email" : "whatsapp";
 
-    if (!isChannelConfigured(channel)) {
-      return res.status(503).json({
-        success: false,
-        message: `${channel} service is not configured`,
-      });
-    }
-
-    const oldRateLimit = await checkRateLimit(oldContact, channel);
-    if (!oldRateLimit.allowed) {
-      return res.status(429).json({
-        success: false,
-        message: oldRateLimit.message,
-        waitSeconds: oldRateLimit.waitSeconds,
-      });
-    }
-
     const { code: oldCode, expiresIn } = await createOtpRecord(
       oldContact,
       channel,
@@ -109,7 +93,12 @@ export const requestContactChange = async (req, res) => {
       user.id
     );
 
-    const oldSendResult = await sendOtp(oldContact, oldCode, channel, "login");
+    const oldSendResult = await sendOtpNotification(
+      oldContact,
+      oldCode,
+      channel,
+      "login"
+    );
 
     if (!oldSendResult.success) {
       return res.status(500).json({

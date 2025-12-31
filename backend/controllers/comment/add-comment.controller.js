@@ -4,33 +4,50 @@ import logger from "../../utils/logger.js";
 export const addComment = async (req, res) => {
   try {
     const { id } = req.params;
-    const { comment } = req.body;
+    const { comment, fileUrl, fileName, fileSize, fileType } = req.body;
 
-    if (!comment || comment.trim().length === 0) {
+    // Validate: must have either comment text or file attachment
+    if ((!comment || comment.trim().length === 0) && !fileUrl) {
       return res.status(400).json({
         success: false,
-        message: "Comment text is required",
+        message: "Either comment text or file attachment is required",
       });
     }
 
-    if (comment.trim().length > 2000) {
+    // Validate comment length if provided
+    if (comment && comment.trim().length > 2000) {
       return res.status(400).json({
         success: false,
         message: "Comment must be less than 2000 characters",
       });
     }
 
+    // Validate file data if fileUrl is provided
+    if (fileUrl && (!fileName || !fileSize || !fileType)) {
+      return res.status(400).json({
+        success: false,
+        message: "fileName, fileSize, and fileType are required when attaching a file",
+      });
+    }
+
+    // Check if case exists
     const caseData = await prisma.case.findUnique({
       where: { id: parseInt(id) },
+      select: { 
+        id: true, 
+        clientProfileId: true,
+        deletedAt: true,
+      },
     });
 
-    if (!caseData) {
+    if (!caseData || caseData.deletedAt) {
       return res.status(404).json({
         success: false,
         message: "Case not found",
       });
     }
 
+    // Check authorization for clients
     if (req.user.role === "client") {
       if (caseData.clientProfileId !== req.user.profile.id) {
         return res.status(403).json({
@@ -40,15 +57,32 @@ export const addComment = async (req, res) => {
       }
     }
 
+    // Build attachments array if file is provided
+    let attachmentsArray = null;
+    if (fileUrl) {
+      attachmentsArray = JSON.stringify([
+        {
+          url: fileUrl,
+          name: fileName,
+          size: fileSize,
+          type: fileType,
+          uploadedAt: new Date().toISOString(),
+        },
+      ]);
+    }
+
+    // Build comment data matching schema
     const commentData = {
       caseId: parseInt(id),
-      authorType: req.user.role === "client" ? "client" : "designer",
-      comment: comment.trim(),
+      authorType: req.user.role, // "client" or "designer"
+      comment: comment ? comment.trim() : "",
+      attachments: attachmentsArray, // JSON string or null
     };
 
+    // Set appropriate profile ID based on role
     if (req.user.role === "client") {
       commentData.clientProfileId = req.user.profile.id;
-    } else {
+    } else if (req.user.role === "designer") {
       commentData.designerProfileId = req.user.profile.id;
     }
 
@@ -69,6 +103,13 @@ export const addComment = async (req, res) => {
           },
         },
       },
+    });
+
+    logger.info("Comment added successfully", {
+      commentId: newComment.id,
+      caseId: parseInt(id),
+      userId: req.user.id,
+      hasAttachment: !!fileUrl,
     });
 
     res.status(201).json({

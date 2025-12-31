@@ -1,9 +1,10 @@
 import prisma from "../../config/db.js";
 import logger from "../../utils/logger.js";
+import { createWebNotification } from "../../services/notification.service.js";
 
 export const reviseQuote = async (req, res) => {
   try {
-    if (req.user.role !== "designer" || !req.user.designerProfile?.isAdmin) {
+    if (req.user.role !== "designer" || !req.user.profile.isAdmin) {
       return res.status(403).json({
         success: false,
         message: "Only admins can revise quotes",
@@ -27,11 +28,19 @@ export const reviseQuote = async (req, res) => {
     const existingQuote = await prisma.caseQuote.findUnique({
       where: { id: parseInt(id) },
       include: {
-        case: true,
+        case: {
+          include: {
+            clientProfile: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
       },
     });
 
-    if (!existingQuote) {
+    if (!existingQuote || existingQuote.deletedAt) {
       return res.status(404).json({
         success: false,
         message: "Quote not found",
@@ -106,20 +115,56 @@ export const reviseQuote = async (req, res) => {
       },
     });
 
+    // Update case status
     await prisma.case.update({
       where: { id: existingQuote.caseId },
       data: { status: "quote_sent" },
     });
 
+    // Create status history - FIXED: correct field names
     await prisma.caseStatusHistory.create({
       data: {
         caseId: existingQuote.caseId,
         fromStatus: "quote_rejected",
         toStatus: "quote_sent",
         changedBy: "designer",
-        changedById: req.user.designerProfile.id,
+        changedByDesignerId: req.user.profile.id, // FIXED
         notes: "Quote revised and re-sent",
       },
+    });
+
+    // Send notification to client (email + web)
+    const clientUser = existingQuote.case.clientProfile.user;
+
+    createWebNotification({
+      userId: clientUser.id,
+      purpose: "quote_sent",
+      title:
+        clientUser.preferredLanguage === "ar"
+          ? `عرض أسعار محدث - ${existingQuote.case.caseNumber}`
+          : `Revised Quote - ${existingQuote.case.caseNumber}`,
+      body:
+        clientUser.preferredLanguage === "ar"
+          ? `تم إرسال عرض أسعار محدث بمبلغ ${totalAmount.toFixed(2)} ريال`
+          : `Revised quote sent for SAR ${totalAmount.toFixed(2)}`,
+      actionUrl: `/cases/${existingQuote.caseId}/quotes/${existingQuote.id}`,
+      metadata: {
+        quoteId: existingQuote.id,
+        caseId: existingQuote.caseId,
+        totalAmount,
+      },
+      language: clientUser.preferredLanguage,
+    }).catch((error) => {
+      logger.error("Failed to send notification:", {
+        error: error.message,
+        quoteId: existingQuote.id,
+      });
+    });
+
+    logger.info("Quote revised", {
+      quoteId: existingQuote.id,
+      caseId: existingQuote.caseId,
+      revisedBy: req.user.profile.id,
     });
 
     res.status(200).json({
@@ -135,7 +180,7 @@ export const reviseQuote = async (req, res) => {
       stack: error.stack,
       controller: "reviseQuote",
       userId: req.user?.id,
-      caseId: req.params?.id,
+      quoteId: req.params?.id,
     });
     return res.status(500).json({
       success: false,

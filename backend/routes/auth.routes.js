@@ -1,5 +1,9 @@
 import express from "express";
-import { sendOtpHandler, verifyOtpHandler, logout } from "../controllers/auth/index.js";
+import {
+  sendOtpHandler,
+  verifyOtpHandler,
+  logout,
+} from "../controllers/auth/index.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 
 const router = express.Router();

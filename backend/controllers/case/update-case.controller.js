@@ -13,10 +13,7 @@ export const updateCase = async (req, res) => {
 
     const { id } = req.params;
     const {
-      patientId,
-      patientName,
-      patientAge,
-      patientGender,
+      patientRef,
       procedureCategory,
       guideType,
       requiredService,
@@ -25,12 +22,16 @@ export const updateCase = async (req, res) => {
       teethNumbers,
       clinicalNotes,
       specialInstructions,
+      deliveryMethod,
+      deliveryAddressId,
+      pickupBranchId,
     } = req.body;
 
     const existingCase = await prisma.case.findFirst({
       where: {
         id: parseInt(id),
         clientProfileId: req.user.profile.id,
+        deletedAt: null, // Soft delete check
       },
     });
 
@@ -41,11 +42,12 @@ export const updateCase = async (req, res) => {
       });
     }
 
-    if (!existingCase.isDraft) {
+    // Check if case can be updated (not yet submitted)
+    if (existingCase.submittedAt) {
       return res.status(400).json({
         success: false,
         message:
-          "Only draft cases can be updated. After submission, please use comments for additional information",
+          "Submitted cases cannot be updated. Please use comments for additional information",
       });
     }
 
@@ -54,8 +56,12 @@ export const updateCase = async (req, res) => {
       guideType: guideType || existingCase.guideType,
       requiredService: requiredService || existingCase.requiredService,
       implantSystem: implantSystem || existingCase.implantSystem,
-      implantSystemOther: implantSystemOther || existingCase.implantSystemOther,
-      isDraft: true,
+      implantSystemOther:
+        implantSystemOther || existingCase.implantSystemOther,
+      teethNumbers: teethNumbers || existingCase.teethNumbers,
+      deliveryMethod: deliveryMethod || existingCase.deliveryMethod,
+      deliveryAddressId: deliveryAddressId || existingCase.deliveryAddressId,
+      pickupBranchId: pickupBranchId || existingCase.pickupBranchId,
     });
 
     if (!validation.valid) {
@@ -67,10 +73,7 @@ export const updateCase = async (req, res) => {
     }
 
     const updateData = {};
-    if (patientId !== undefined) updateData.patientId = patientId;
-    if (patientName !== undefined) updateData.patientName = patientName;
-    if (patientAge !== undefined) updateData.patientAge = patientAge;
-    if (patientGender !== undefined) updateData.patientGender = patientGender;
+    if (patientRef !== undefined) updateData.patientRef = patientRef;
     if (procedureCategory !== undefined)
       updateData.procedureCategory = procedureCategory;
     if (guideType !== undefined) updateData.guideType = guideType;
@@ -84,6 +87,12 @@ export const updateCase = async (req, res) => {
     if (clinicalNotes !== undefined) updateData.clinicalNotes = clinicalNotes;
     if (specialInstructions !== undefined)
       updateData.specialInstructions = specialInstructions;
+    if (deliveryMethod !== undefined)
+      updateData.deliveryMethod = deliveryMethod;
+    if (deliveryAddressId !== undefined)
+      updateData.deliveryAddressId = deliveryAddressId;
+    if (pickupBranchId !== undefined)
+      updateData.pickupBranchId = pickupBranchId;
 
     const updatedCase = await prisma.case.update({
       where: { id: parseInt(id) },
@@ -99,9 +108,14 @@ export const updateCase = async (req, res) => {
       },
     });
 
+    logger.info("Case updated successfully", {
+      caseId: updatedCase.id,
+      userId: req.user.id,
+    });
+
     res.status(200).json({
       success: true,
-      message: "Draft case updated successfully",
+      message: "Case updated successfully",
       data: {
         case: updatedCase,
       },

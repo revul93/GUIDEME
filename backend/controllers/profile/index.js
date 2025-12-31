@@ -1,14 +1,29 @@
-export { getProfile } from './get-profile.controller.js';
-export { updateProfile } from './update-profile.controller.js';
+export { getProfile } from "./get-profile.controller.js";
+export { updateProfile } from "./update-profile.controller.js";
 export {
   listAddresses,
   addAddress,
   updateAddress,
   deleteAddress,
   setDefaultAddress,
-} from './address.controller.js';
+} from "./address.controller.js";
 export {
   requestContactChange,
   verifyOldContact,
   verifyNewContact,
-} from './change-contact.controller.js';
+} from "./change-contact.controller.js";
+export {
+  uploadProfileImage,
+  deleteProfileImage,
+} from "./profile-image.controller.js";
+export {
+  getPreferences,
+  updateLanguage,
+  updateTimezone,
+  updateNotificationPreferences,
+  updateAllPreferences,
+} from "./preferences.controller.js";
+export {
+  getStats,
+  getPaymentHistory,
+} from "./stats.controller.js";

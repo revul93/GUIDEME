@@ -14,13 +14,12 @@ export const uploadFile = async (req, res) => {
       });
     }
 
+    // Match schema FileCategory enum exactly
     const validCategories = [
-      "xray",
-      "ct_scan",
-      "cbct",
       "dicom",
-      "intraoral_scan",
       "stl",
+      "ply",
+      "zip",
       "clinical_photo",
       "prescription",
       "study_file",
@@ -33,10 +32,11 @@ export const uploadFile = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Invalid file category",
+        validCategories,
       });
     }
 
-    const maxFileSize = 100 * 1024 * 1024;
+    const maxFileSize = 100 * 1024 * 1024; // 100MB
     if (fileSize > maxFileSize) {
       return res.status(400).json({
         success: false,
@@ -46,15 +46,21 @@ export const uploadFile = async (req, res) => {
 
     const caseData = await prisma.case.findUnique({
       where: { id: parseInt(id) },
+      select: {
+        id: true,
+        clientProfileId: true,
+        deletedAt: true,
+      },
     });
 
-    if (!caseData) {
+    if (!caseData || caseData.deletedAt) {
       return res.status(404).json({
         success: false,
         message: "Case not found",
       });
     }
 
+    // Check authorization for clients
     if (req.user.role === "client") {
       if (caseData.clientProfileId !== req.user.profile.id) {
         return res.status(403).json({
@@ -76,6 +82,13 @@ export const uploadFile = async (req, res) => {
         uploadedBy: req.user.role === "client" ? "client" : "designer",
         uploadedById: req.user.profile.id,
       },
+    });
+
+    logger.info("File metadata saved successfully", {
+      fileId: file.id,
+      caseId: parseInt(id),
+      userId: req.user.id,
+      category: file.category,
     });
 
     res.status(201).json({
@@ -107,15 +120,21 @@ export const listFiles = async (req, res) => {
 
     const caseData = await prisma.case.findUnique({
       where: { id: parseInt(id) },
+      select: {
+        id: true,
+        clientProfileId: true,
+        deletedAt: true,
+      },
     });
 
-    if (!caseData) {
+    if (!caseData || caseData.deletedAt) {
       return res.status(404).json({
         success: false,
         message: "Case not found",
       });
     }
 
+    // Check authorization for clients
     if (req.user.role === "client") {
       if (caseData.clientProfileId !== req.user.profile.id) {
         return res.status(403).json({
@@ -125,7 +144,11 @@ export const listFiles = async (req, res) => {
       }
     }
 
-    const where = { caseId: parseInt(id) };
+    const where = { 
+      caseId: parseInt(id),
+      deletedAt: null, // Exclude soft-deleted files
+    };
+    
     if (category) {
       where.category = category;
     }
@@ -133,6 +156,12 @@ export const listFiles = async (req, res) => {
     const files = await prisma.caseFile.findMany({
       where,
       orderBy: { createdAt: "desc" },
+    });
+
+    logger.info("Files listed successfully", {
+      caseId: parseInt(id),
+      count: files.length,
+      userId: req.user.id,
     });
 
     res.status(200).json({
@@ -167,18 +196,27 @@ export const deleteFile = async (req, res) => {
         case: {
           select: {
             clientProfileId: true,
+            deletedAt: true,
           },
         },
       },
     });
 
-    if (!file) {
+    if (!file || file.deletedAt) {
       return res.status(404).json({
         success: false,
         message: "File not found",
       });
     }
 
+    if (file.case.deletedAt) {
+      return res.status(404).json({
+        success: false,
+        message: "Case not found",
+      });
+    }
+
+    // Check authorization
     if (req.user.role === "client") {
       if (file.case.clientProfileId !== req.user.profile.id) {
         return res.status(403).json({
@@ -187,7 +225,7 @@ export const deleteFile = async (req, res) => {
         });
       }
 
-      if (file.uploadedBy !== "client") {
+      if (file.uploadedBy !== "client" || file.uploadedById !== req.user.profile.id) {
         return res.status(403).json({
           success: false,
           message: "You can only delete your own files",
@@ -196,9 +234,11 @@ export const deleteFile = async (req, res) => {
     }
 
     if (req.user.role === "designer") {
+      // Designers can delete their own files
       if (
         file.uploadedBy === "designer" &&
-        file.uploadedById !== req.user.profile.id
+        file.uploadedById !== req.user.profile.id &&
+        !req.user.profile.isAdmin
       ) {
         return res.status(403).json({
           success: false,
@@ -207,8 +247,15 @@ export const deleteFile = async (req, res) => {
       }
     }
 
-    await prisma.caseFile.delete({
+    // Soft delete
+    await prisma.caseFile.update({
       where: { id: parseInt(id) },
+      data: { deletedAt: new Date() },
+    });
+
+    logger.info("File deleted successfully", {
+      fileId: parseInt(id),
+      userId: req.user.id,
     });
 
     res.status(200).json({
@@ -221,7 +268,7 @@ export const deleteFile = async (req, res) => {
       stack: error.stack,
       controller: "deleteFile",
       userId: req.user?.id,
-      caseId: req.params?.id,
+      fileId: req.params?.id,
     });
     return res.status(500).json({
       success: false,
