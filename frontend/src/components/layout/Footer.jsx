@@ -25,9 +25,7 @@ const Footer = () => {
   return (
     <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Mobile: Vertical Stack | Desktop: Single Line */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          {/* Logo */}
           <div className="flex justify-center md:justify-start">
             <img
               src={isDark ? "/brand.svg" : "/brand.svg"}
@@ -82,20 +80,19 @@ const Footer = () => {
             })}
           </div>
 
-          {/* Legal Links + Copyright */}
           <div className="flex items-center gap-2 text-sm text-charcoal dark:text-gray-400">
             <Link
               to="/terms"
               className="hover:text-accent dark:hover:text-accent-secondary transition-colors"
             >
-              Terms
+              {t("footer.terms")}
             </Link>
             <span>•</span>
             <Link
               to="/privacy"
               className="hover:text-accent dark:hover:text-accent-secondary transition-colors"
             >
-              Privacy
+              {t("footer.privacy")}
             </Link>
             <span>•</span>
             <span>© {currentYear} GuideMe</span>

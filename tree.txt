@@ -1,0 +1,166 @@
+GuideMe
+|   .gitignore
+|   package-lock.json
+|   package.json
+-----backend
+|   |   .env
+|   |   dev.db
+|   |   index.js
+|   |   package-lock.json
+|   |   package.json
+|   |   prisma-helper.bat
+|   |   prisma-helper.sh
+|   |   prisma.config.ts
+|   -----config
+|   |       db.js
+|   |       email.config.js
+|   -----controllers
+|   |   -----admin
+|   |   |       announcement.controller.js
+|   |   |       case-management.controller.js
+|   |   |       create-designer.controller.js
+|   |   |       create-discount-code.controller.js
+|   |   |       create-lab.controller.js
+|   |   |       dashboard.controller.js
+|   |   |       get-discount-code.controller.js
+|   |   |       lab-approval.controller.js
+|   |   |       list-discount-codes.controller.js
+|   |   |       payment-financial.controller.js
+|   |   |       update-delete-discount-code.controller.js
+|   |   |       user-management.controller.js  
+|   |   -----auth
+|   |   |       index.js
+|   |   |       login.controller.js
+|   |   |       logout.controller.js
+|   |   |       otp.controller.js
+|   |   |       register.controller.js
+|   |   |       validation.js   
+|   |   -----case
+|   |   |       case-status.controller.js
+|   |   |       create-case.controller.js
+|   |   |       get-case.controller.js
+|   |   |       get-cases.controller.js
+|   |   |       get-status-history.controller.js
+|   |   |       index.js
+|   |   |       stats.controller.js
+|   |   |       update-case.controller.js
+|   |   |       validation.js  
+|   |   -----client
+|   |   |       apply-remove-discount-code.controller.js
+|   |   |       validate-discount-code.controller.js
+|   |   -----comment
+|   |   |       add-comment.controller.js
+|   |   |       index.js
+|   |   |       list-comments.controller.js
+|   |   |       mark-read.controller.js   
+|   |   -----designer
+|   |   |       index.js
+|   |   |       list-cases.controller.js
+|   |   |       update-case-status.controller.js
+|   |   |       view-client-profile.controller.js   
+|   |   -----file
+|   |   |       index.js
+|   |   |       upload-file.controller.js 
+|   |   -----notification
+|   |   |       notification.controller.js     
+|   |   -----payment
+|   |   |       index.js
+|   |   |       list-payments.controller.js
+|   |   |       refund.controller.js
+|   |   |       upload-payment.controller.js
+|   |   |       verify-payment.controller.js   
+|   |   -----profile
+|   |   |       address.controller.js
+|   |   |       change-contact.controller.js
+|   |   |       get-profile.controller.js
+|   |   |       index.js
+|   |   |       preferences.controller.js
+|   |   |       profile-image.controller.js
+|   |   |       stats.controller.js
+|   |   |       update-profile.controller.js
+|   |   -----quote
+|   |           accept-reject-quote.controller.js
+|   |           create-quote.controller.js
+|   |           index.js
+|   |           list-quotes.controller.js
+|   |           quote-index.js
+|   |           revise-quote.controller.js
+|   -----middleware
+|   |       admin.middleware.js
+|   |       auth.middleware.js
+|   |       authorization.middleware.js
+|   -----prisma
+|   |   |   dev_schema.prisma             
+|   -----routes
+|   |       admin.routes.js
+|   |       api.js
+|   |       auth.routes.js
+|   |       case.routes.js
+|   |       comment.routes.js
+|   |       designer.routes.js
+|   |       discount.routes.js
+|   |       file.routes.js
+|   |       notification.routes.js
+|   |       payment.routes.js
+|   |       profile.routes.js
+|   |       quote.routes.js
+|   -----services
+|   |       discount.service.js
+|   |       email.service.js
+|   |       fileUpload.service.js
+|   |       notification.service.js
+|   |       otp.service.js
+|   |       twilio.service.js
+|   -----utils
+|           jwt.js
+|           logger.js
+-----frontend
+    |   eslint.config.js
+    |   index.html
+    |   package-lock.json
+    |   package.json
+    |   postcss.config.js
+    |   tailwind.config.js
+    |   vite.config.js
+    -----public
+    |       background_1.png
+    |       background_2.png
+    |       background_3.png
+    |       brand.svg
+    |       logo.svg
+    -----src
+        |   App.jsx
+        |   index.css
+        |   main.jsx
+        -----components
+        |   -----common
+        |   |       CountryCodeSelector.jsx
+        |   |       ProtectedRoute.jsx    
+        |   -----home
+        |   |       Contact.jsx
+        |   |       Hero.jsx
+        |   |       HowWeWork.jsx
+        |   |       Services.jsx
+        |   |       Team.jsx
+        |   |       Values.jsx
+        |   |       WhoWeAre.jsx
+        |   -----layout
+        |           AuthModal.jsx
+        |           Footer.jsx
+        |           Header.jsx
+        |           MobileMenu.jsx
+        -----context
+        |       AuthContext.jsx
+        |       LanguageContext.jsx
+        |       NotificationContext.jsx
+        |       ThemeContext.jsx
+        -----i18n
+        |       ar.json
+        |       config.js
+        |       en.json
+        -----pages
+        |       Home.jsx
+        -----services
+        |       authService.js
+        -----utils
+                api.js

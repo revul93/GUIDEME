@@ -16,7 +16,6 @@ export const ThemeProvider = ({ children }) => {
     if (saved) {
       return saved === "dark";
     }
-    // DEFAULT TO DARK MODE
     return true;
   });
 

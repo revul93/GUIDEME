@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
 import { useTranslation } from "react-i18next";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
@@ -19,6 +20,7 @@ import AuthModal from "./AuthModal.jsx";
 const Header = () => {
   const { isDark, toggleTheme } = useTheme();
   const { language, toggleLanguage } = useLanguage();
+  const { isAuthenticated, user, logout } = useAuth();
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -28,37 +30,6 @@ const Header = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalType, setAuthModalType] = useState("login");
   const [activeSection, setActiveSection] = useState("home");
-
-  // Auth state
-  const [user, setUser] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  // Check authentication status
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem("accessToken");
-      const userData = localStorage.getItem("user");
-
-      if (token && userData) {
-        try {
-          const parsedUser = JSON.parse(userData);
-          setUser(parsedUser);
-          setIsLoggedIn(true);
-        } catch (error) {
-          console.error("Error parsing user data:", error);
-          setIsLoggedIn(false);
-          setUser(null);
-        }
-      } else {
-        setIsLoggedIn(false);
-        setUser(null);
-      }
-    };
-
-    checkAuth();
-    window.addEventListener("storage", checkAuth);
-    return () => window.removeEventListener("storage", checkAuth);
-  }, []);
 
   // Scroll detection
   useEffect(() => {
@@ -103,13 +74,13 @@ const Header = () => {
       observerCallback,
       observerOptions
     );
+
     const sections = [
       "home",
       "who-we-are",
       "how-we-work",
-      "services",
-      "portfolio",
       "values",
+      "services",
       "team",
       "contact",
     ];
@@ -122,36 +93,41 @@ const Header = () => {
     return () => observer.disconnect();
   }, [location.pathname]);
 
-  // Navigation handlers
+  const navLinks = [
+    { id: "home", label: t("nav.home"), section: "home" },
+    { id: "who-we-are", label: t("nav.whoWeAre"), section: "who-we-are" },
+    { id: "how-we-work", label: t("nav.howWeWork"), section: "how-we-work" },
+    { id: "values", label: t("nav.values"), section: "values" },
+    { id: "services", label: t("nav.services"), section: "services" },
+    { id: "team", label: t("nav.team"), section: "team" },
+    { id: "contact", label: t("nav.contact"), section: "contact" },
+  ];
+
   const scrollToSection = (sectionId) => {
-    if (sectionId === "home") {
-      if (location.pathname === "/") {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } else {
-        navigate("/");
-      }
-    } else {
-      if (location.pathname !== "/") {
-        navigate("/");
-        setTimeout(() => {
-          const element = document.getElementById(sectionId);
-          if (element) {
-            const yOffset = -100;
-            const y =
-              element.getBoundingClientRect().top +
-              window.pageYOffset +
-              yOffset;
-            window.scrollTo({ top: y, behavior: "smooth" });
-          }
-        }, 100);
-      } else {
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => {
         const element = document.getElementById(sectionId);
         if (element) {
-          const yOffset = -100;
-          const y =
-            element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-          window.scrollTo({ top: y, behavior: "smooth" });
+          const offset = 80;
+          const elementPosition =
+            element.getBoundingClientRect().top + window.pageYOffset;
+          window.scrollTo({
+            top: elementPosition - offset,
+            behavior: "smooth",
+          });
         }
+      }, 100);
+    } else {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        const offset = 80;
+        const elementPosition =
+          element.getBoundingClientRect().top + window.pageYOffset;
+        window.scrollTo({
+          top: elementPosition - offset,
+          behavior: "smooth",
+        });
       }
     }
   };
@@ -166,255 +142,153 @@ const Header = () => {
     setAuthModalOpen(true);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("user");
-    setIsLoggedIn(false);
-    setUser(null);
-    navigate("/");
+  const handleLogout = async () => {
+    await logout();
   };
-
-  // Get navigation links based on user role
-  const getNavLinks = () => {
-    if (!isLoggedIn) {
-      return [
-        { id: "home", label: t("nav.home"), section: "home" },
-        { id: "who-we-are", label: t("nav.whoWeAre"), section: "who-we-are" },
-        {
-          id: "how-we-work",
-          label: t("nav.howWeWork"),
-          section: "how-we-work",
-        },
-        { id: "values", label: t("nav.values"), section: "values" },
-        { id: "services", label: t("nav.services"), section: "services" },
-        { id: "team", label: t("nav.team"), section: "team" },
-        { id: "contact", label: t("nav.contact"), section: "contact" },
-      ];
-    }
-
-    const role = user?.role;
-
-    switch (role) {
-      case "client":
-        return [
-          { id: "home", label: t("nav.home"), path: "/" },
-          {
-            id: "my-cases",
-            label: t("nav.myCases"),
-            path: "/dashboard/cases",
-          },
-          {
-            id: "new-case",
-            label: t("nav.newCase"),
-            path: "/dashboard/newcase",
-          },
-          {
-            id: "my-payments",
-            label: t("nav.payments"),
-            path: "/dashboard/payments",
-          },
-          {
-            id: "my-info",
-            label: t("nav.myInfo"),
-            path: "/dashboard/myinfo",
-          },
-        ];
-
-      case "designer":
-        return [
-          { id: "home", label: t("nav.home"), path: "/" },
-          {
-            id: "available-cases",
-            label: t("nav.availableCases"),
-            path: "/dashboard/available-cases",
-          },
-          {
-            id: "my-designs",
-            label: t("nav.myDesigns"),
-            path: "/dashboard/my-designs",
-          },
-          {
-            id: "payments",
-            label: t("nav.myPayments"),
-            path: "/dashboard/payments",
-          },
-        ];
-
-      case "LAB":
-        return [
-          { id: "home", label: t("nav.home"), path: "/" },
-          {
-            id: "lab-orders",
-            label: t("nav.labOrders"),
-            path: "/dashboard/orders",
-          },
-          {
-            id: "production",
-            label: t("nav.production"),
-            path: "/dashboard/production",
-          },
-          {
-            id: "payments",
-            label: t("nav.myPayments"),
-            path: "/dashboard/payments",
-          },
-        ];
-
-      case "ADMIN":
-        return [
-          { id: "home", label: t("nav.home"), path: "/" },
-          { id: "users", label: t("nav.users"), path: "/dashboard/users" },
-          { id: "cases", label: t("nav.myCases"), path: "/dashboard/cases" },
-          {
-            id: "settings",
-            label: t("nav.systemSettings"),
-            path: "/dashboard/settings",
-          },
-        ];
-
-      default:
-        return [{ id: "home", label: t("nav.home"), path: "/" }];
-    }
-  };
-
-  const navLinks = getNavLinks();
 
   return (
     <>
       <header
-        className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
-            ? "bg-light/90 dark:bg-dark/90 backdrop-blur-lg shadow-lg"
-            : "bg-light dark:bg-dark"
+            ? "bg-light/95 dark:bg-dark/95 backdrop-blur-md shadow-lg"
+            : "bg-transparent"
         }`}
       >
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 border-b border-gray-200/50 dark:border-gray-700/50">
-            <Link
-              to="/"
-              className="flex items-center transition-all duration-300"
-            >
+        <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link to="/" className="flex-shrink-0">
               <img
                 src={isDark ? "/brand.svg" : "/brand.svg"}
                 alt="GuideMe Logo"
-                className="h-10 w-auto object-contain"
+                className="h-8 w-auto object-contain"
               />
             </Link>
 
-            <div className="flex items-center gap-2">
-              <div className="hidden lg:flex items-center gap-2">
-                {!isLoggedIn ? (
-                  <>
-                    <button
-                      onClick={handleLoginClick}
-                      className="inline-flex items-center gap-2 px-4 py-2 text-charcoal dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg font-medium transition-all cursor-pointer"
-                    >
-                      <LoginIcon className="w-5 h-5" />
-                      <span>{t("nav.login")}</span>
-                    </button>
-                    <button
-                      onClick={handleRegisterClick}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-primary dark:bg-accent text-light hover:bg-primary/90 dark:hover:bg-accent/90 rounded-lg font-medium transition-all shadow-md hover:shadow-lg cursor-pointer"
-                    >
-                      <PersonAddIcon className="w-5 h-5" />
-                      <span>{t("nav.register")}</span>
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      to="/dashboard/profile"
-                      className="p-2 text-charcoal dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all cursor-pointer"
-                      title={t("nav.profile")}
-                    >
-                      <AccountCircleIcon className="w-6 h-6" />
-                    </Link>
-                    <button
-                      className="p-2 text-charcoal dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all relative cursor-pointer"
-                      title={t("nav.notifications")}
-                    >
-                      <NotificationsIcon className="w-6 h-6" />
-                      <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                    </button>
-                    <button
-                      onClick={handleLogout}
-                      className="inline-flex items-center gap-2 px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg font-medium transition-all cursor-pointer"
-                    >
-                      <LogoutIcon className="w-5 h-5" />
-                      <span>{t("nav.logout")}</span>
-                    </button>
-                  </>
-                )}
-              </div>
-
-              {/* Theme & Language Toggles */}
-              <div className="flex items-center gap-1">
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center gap-1">
+              {navLinks.map((link) => (
                 <button
-                  onClick={toggleTheme}
-                  className="p-2 text-charcoal dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all cursor-pointer"
-                  aria-label="Toggle theme"
+                  key={link.id}
+                  onClick={() => scrollToSection(link.section)}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    activeSection === link.section
+                      ? "text-primary dark:text-accent bg-primary/10 dark:bg-accent/10"
+                      : "text-charcoal dark:text-gray-300 hover:text-primary dark:hover:text-accent hover:bg-gray-100 dark:hover:bg-gray-800"
+                  }`}
                 >
-                  {isDark ? (
-                    <LightModeIcon className="w-5 h-5" />
-                  ) : (
-                    <DarkModeIcon className="w-5 h-5" />
-                  )}
+                  {link.label}
                 </button>
-                <button
-                  onClick={toggleLanguage}
-                  className="p-2 text-charcoal dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all cursor-pointer"
-                  aria-label="Toggle language"
-                >
-                  <div className="flex items-center gap-1">
-                    <LanguageIcon className="w-5 h-5" />
-                    <span className="text-xs font-bold">
-                      {language.toUpperCase()}
-                    </span>
-                  </div>
-                </button>
-              </div>
-
-              {/* Mobile Menu Button */}
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2 text-charcoal dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all cursor-pointer"
-                aria-label="Toggle menu"
-              >
-                {isMobileMenuOpen ? (
-                  <CloseIcon className="w-6 h-6" />
-                ) : (
-                  <MenuIcon className="w-6 h-6" />
-                )}
-              </button>
+              ))}
             </div>
-          </div>
 
-          {/* Second Line: Navigation (Desktop Only) */}
-          <nav className="hidden lg:flex items-center justify-center gap-1 h-12">
-            {navLinks.map((link) => (
+            {/* Desktop Actions */}
+            <div className="hidden lg:flex items-center gap-3">
+              {/* Theme Toggle */}
               <button
-                key={link.id}
-                onClick={() =>
-                  link.path
-                    ? navigate(link.path)
-                    : scrollToSection(link.section)
-                }
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer ${
-                  (link.path && location.pathname === link.path) ||
-                  activeSection === link.section
-                    ? "bg-primary dark:bg-accent text-light shadow-md"
-                    : "text-charcoal dark:text-gray-300 hover:bg-accent/20 dark:hover:bg-accent/20 hover:text-accent dark:hover:text-accent-secondary"
-                }`}
+                onClick={toggleTheme}
+                className="p-2 text-charcoal dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                aria-label="Toggle theme"
               >
-                {link.label}
+                {isDark ? (
+                  <LightModeIcon className="w-5 h-5" />
+                ) : (
+                  <DarkModeIcon className="w-5 h-5" />
+                )}
               </button>
-            ))}
-          </nav>
-        </div>
-      </header>
 
-      {/* Spacer */}
-      <div className="h-16 lg:h-28"></div>
+              {/* Language Toggle */}
+              <button
+                onClick={toggleLanguage}
+                className="p-2 text-charcoal dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center gap-1"
+                aria-label="Toggle language"
+              >
+                <LanguageIcon className="w-5 h-5" />
+                <span className="text-sm font-bold">
+                  {language === "en" ? "العربية" : "EN"}
+                </span>
+              </button>
+
+              {/* Auth Buttons or User Menu */}
+              {!isAuthenticated ? (
+                <>
+                  <button
+                    onClick={handleLoginClick}
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-charcoal dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                  >
+                    <LoginIcon className="w-4 h-4" />
+                    <span>{t("nav.login")}</span>
+                  </button>
+                  <button
+                    onClick={handleRegisterClick}
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-light bg-primary dark:bg-accent hover:bg-primary/90 dark:hover:bg-accent/90 rounded-lg transition-colors shadow-md"
+                  >
+                    <PersonAddIcon className="w-4 h-4" />
+                    <span>{t("nav.register")}</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  {/* Notifications */}
+                  <button className="relative p-2 text-charcoal dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+                    <NotificationsIcon className="w-5 h-5" />
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  </button>
+
+                  {/* Profile Dropdown */}
+                  <div className="relative group">
+                    <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-charcoal dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+                      <AccountCircleIcon className="w-5 h-5" />
+                      <span>{user?.profile?.name || "Profile"}</span>
+                    </button>
+
+                    {/* Dropdown Menu */}
+                    <div className="absolute right-0 mt-2 w-48 bg-light dark:bg-dark border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                      <div className="py-2">
+                        <Link
+                          to="/dashboard/profile"
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-charcoal dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        >
+                          <AccountCircleIcon className="w-4 h-4" />
+                          <span>Profile</span>
+                        </Link>
+                        <Link
+                          to="/dashboard/cases"
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-charcoal dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        >
+                          <span>My Cases</span>
+                        </Link>
+                        <hr className="my-2 border-gray-200 dark:border-gray-700" />
+                        <button
+                          onClick={handleLogout}
+                          className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                        >
+                          <LogoutIcon className="w-4 h-4" />
+                          <span>Logout</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden p-2 text-charcoal dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              aria-label="Toggle menu"
+            >
+              {isMobileMenuOpen ? (
+                <CloseIcon className="w-6 h-6" />
+              ) : (
+                <MenuIcon className="w-6 h-6" />
+              )}
+            </button>
+          </div>
+        </nav>
+      </header>
 
       {/* Mobile Menu */}
       <MobileMenu
@@ -425,7 +299,7 @@ const Header = () => {
         scrollToSection={scrollToSection}
         onLoginClick={handleLoginClick}
         onRegisterClick={handleRegisterClick}
-        isLoggedIn={isLoggedIn}
+        isLoggedIn={isAuthenticated}
         user={user}
         onLogout={handleLogout}
       />
@@ -438,7 +312,6 @@ const Header = () => {
         onSwitchType={(type) => setAuthModalType(type)}
         onSuccess={() => {
           setAuthModalOpen(false);
-          window.location.reload(); // Reload to update auth state
         }}
       />
     </>

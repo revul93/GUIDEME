@@ -1,0 +1,595 @@
+{
+  "nav": {
+    "home": "Home",
+    "whoWeAre": "Who We Are",
+    "howWeWork": "How It Works",
+    "values": "Values",
+    "services": "Services",
+    "team": "Team",
+    "contact": "Contact",
+
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+
+    "dashboard": "Dashboard",
+    "myCases": "My Cases",
+    "newCase": "New Case",
+    "payments": "Payments",
+    "myInfo": "My Info",
+    "profile": "Profile",
+
+    "systemSettings": "Settings"
+  },
+  "hero": {
+    "title": "Your Partner in Guided Dental Surgery",
+    "subtitle": "Designed by specialists for specialists",
+    "cta": "Know More"
+  },
+  "whoWeAre": {
+    "title": "Who We Are",
+    "p1": "GuideMe is a cloud-based digital dental laboratory, built and led by specialized dental clinicians. Operating at the intersection of clinical science and advanced digital engineering, we deliver precision-driven solutions in implant dentistry and comprehensive laboratory services.",
+    "p2": "Our work focuses on high-accuracy surgical guides, implant-supported titanium bars, and digitally planned workflows designed to support predictable, prosthetically driven outcomes.",
+    "cloud": {
+      "title": "Cloud-Based Digital Lab",
+      "text": "A cloud-based digital dental laboratory, built and led by specialized dental clinicians."
+    },
+    "precision": {
+      "title": "Precision Engineering",
+      "text": "Operating at the intersection of clinical science and advanced digital engineering."
+    },
+    "outcomes": {
+      "title": "Predictable Outcomes",
+      "text": "High-accuracy surgical guides and digitally planned workflows designed for prosthetically driven results."
+    }
+  },
+  "howWeWork": {
+    "title": "How We Work",
+    "subtitle": "A streamlined process to ensure precision and efficiency in every case",
+    "steps": {
+      "step1": {
+        "title": "Scan. Upload. Approve",
+        "description": "Your case data is submitted and ready for digital planning"
+      },
+      "step2": {
+        "title": "Digital Planning by Specialists",
+        "description": "Surgical and prosthetic planning designed for accuracy and predictability"
+      },
+      "step3": {
+        "title": "Precision Manufacturing",
+        "description": "Your guides or prosthetics are produced using advanced digital technologies"
+      },
+      "step4": {
+        "title": "Delivered with Ongoing Support",
+        "description": "On-time delivery with continuous clinical support when you need it"
+      }
+    }
+  },
+  "values": {
+    "title": "Our Values",
+    "subtitle": "The principles that guide everything we do",
+    "missionVisionTitle": "Our Mission & Vision",
+    "mission": {
+      "title": "Mission",
+      "description": "To empower dentists and dental labs with reliable digital planning, precise surgical guides, and a seamless case-submission experience—delivering clarity and confidence in every treatment"
+    },
+    "vision": {
+      "title": "Vision",
+      "description": "To become the trusted digital partner for clinicians worldwide—where every dental implant treatment begins with structured diagnostics, guided workflows, and uncompromising precision."
+    },
+    "precision": {
+      "title": "Precision",
+      "description": "Every step, every design, every surgical guide... built on a calculated methodology."
+    },
+    "transparency": {
+      "title": "Transparency",
+      "description": "Clear information, clear plan, clear communication, clear prices."
+    },
+    "reliability": {
+      "title": "Clinical Reliability",
+      "description": "What is delivered to the doctor is clinically applicable without surprises."
+    },
+    "innovation": {
+      "title": "Innovation",
+      "description": "Advanced technology, continuous improvement, and constant development of the user journey."
+    },
+    "partnership": {
+      "title": "Partnership",
+      "description": "We see ourselves as part of the doctor's team, not just a service provider."
+    }
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Comprehensive digital dental solutions designed for precision and excellence.",
+    "digitalSurgical": {
+      "title": "Digital Surgical Solutions",
+      "description": "Comprehensive digital surgical guide services for precise implant placement",
+      "items": {
+        "fullyDigitalGuides": "Fully Digital Surgical Guides",
+        "toothSupported": "Tooth-Supported Guides",
+        "tissueSupported": "Tissue-Supported Guides",
+        "boneSupported": "Bone-Supported Guides",
+        "stackableGuides": "Stackable Guides",
+        "pilotDrill": "Pilot Drill Guides",
+        "fullyGuided": "Fully Guided Surgery",
+        "sinusLift": "Sinus Lift Guides",
+        "endoGuides": "Endo Guides",
+        "apicoectomy": "Apicoectomy Guides",
+        "gingivectomy": "Gingivectomy Guides",
+        "boneReduction": "Bone Reduction Guides",
+        "cbctIntegration": "CBCT + Intraoral Scan Integration",
+        "prostheticallyDriven": "Prosthetically Driven Planning",
+        "multiUnitSupport": "Multi-Unit Support",
+        "predictablePlacement": "Predictable Implant Placement",
+        "fullArchGuided": "Full Arch Guided Solutions",
+        "allOnX": "All-on-4 / All-on-6 / All-on-X",
+        "immediateLoading": "Immediate Loading Workflows"
+      }
+    },
+    "prosthetic": {
+      "title": "Digital Prosthetic Solutions",
+      "description": "Premium prosthetic components and full arch solutions",
+      "items": {
+        "precisionTitanium": "Precision Titanium Bars",
+        "screwRetained": "Screw-Retained Systems",
+        "passiveFit": "Passive Fit (Digitally Verified)",
+        "stackableWorkflow": "Stackable Guided Workflow",
+        "fullArchProsthetics": "Full Arch Prosthetics",
+        "allOnBars": "All-on-4 / All-on-6 Bars",
+        "hybridDentures": "Hybrid Dentures",
+        "pmmaPrototypes": "PMMA Prototypes",
+        "finalProstheses": "Final Prostheses",
+        "customComponents": "Custom Components",
+        "customAbutments": "Custom Abutments",
+        "multiUnitDesigns": "Multi-Unit Compatible Designs"
+      }
+    },
+    "manufacturing": {
+      "title": "Advanced Manufacturing & Printing",
+      "description": "State-of-the-art manufacturing with quality assurance",
+      "items": {
+        "highPrecision3d": "High-Precision 3D Printing",
+        "surgicalResin": "Surgical Resin Printing",
+        "temporaryResin": "Temporary Resin Solutions",
+        "millingMetal": "Milling & Metal Manufacturing",
+        "titaniumMilled": "Titanium (Milled)",
+        "pmmaManufacturing": "PMMA Manufacturing",
+        "slmTechnology": "SLM Technology",
+        "qualityAssurance": "Quality Assurance Protocols",
+        "fastTurnaround": "Fast Turnaround Times",
+        "clinicalValidation": "Clinical Accuracy Validation"
+      }
+    },
+    "planning": {
+      "title": "Digital Planning & Design Services",
+      "description": "Expert case planning and visualization services",
+      "items": {
+        "digitalImplant": "Digital Implant Planning",
+        "caseVisualization": "3D Case Visualization",
+        "prostheticallyDriven": "Prosthetic-Driven Design",
+        "fullArchPlanning": "Full Arch Planning",
+        "smileDesign": "Smile Design",
+        "comprehensiveStudy": "Comprehensive Case Study & Planning"
+      }
+    },
+    "supply": {
+      "title": "Implant Systems & Accessories Supply",
+      "description": "Complete range of implant systems and surgical accessories",
+      "items": {
+        "dentalImplants": "Dental Implant Systems",
+        "surgicalKits": "Surgical Kits & Drills",
+        "multiUnitAbutments": "Multi-Unit Abutments",
+        "screwsDrivers": "Screws, Drivers & Prosthetic Components",
+        "guidedAccessories": "Guided Surgery Accessories"
+      }
+    }
+  },
+  "team": {
+    "title": "Our Team",
+    "subtitle": "Meet the specialists behind GuideMe's precision solutions.",
+    "member1": {
+      "name": "Ahmed Al-Rashid",
+      "role": "Chief Clinical Officer",
+      "bio": "15+ years in dental implantology"
+    },
+    "member2": {
+      "name": "Sara Al-Mansour",
+      "role": "Lead Prosthodontist",
+      "bio": "Surgical guide design specialist"
+    },
+    "member3": {
+      "name": "Khalid Al-Otaibi",
+      "role": "Digital Design Lead",
+      "bio": "Expert in CAD/CAM dental design"
+    },
+    "member4": {
+      "name": "Fatima Al-Zahrani",
+      "role": "Surgical Planning Specialist",
+      "bio": "Dedicated to exceptional support"
+    }
+  },
+  "contact": {
+    "title": "Ready to Get Started?",
+    "subtitle": "Let's work together on your next case",
+    "ready": "Ready to Transform Your Practice?",
+    "description": "Join hundreds of satisfied clinicians who trust GuideMe for their digital implant planning and surgical guide needs.",
+    "getStarted": "Get Started Today",
+    "registerMessage": "Register for an account to start submitting cases",
+    "phone": "Phone",
+    "email": "Email",
+    "location": "Location",
+    "address": "123 Dental Street, Medical District",
+    "trustBadge": "Trusted by 500+ dental professionals"
+  },
+
+  "settings": {
+    "theme": "Theme",
+    "language": "Language",
+    "lightMode": "Light",
+    "darkMode": "Dark"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Login to your account",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Register now"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Join GuideMe today",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Login"
+    },
+    "loginMethod": {
+      "title": "Choose login method",
+      "whatsapp": "WhatsApp",
+      "email": "Email"
+    },
+    "contactMethod": {
+      "title": "How should we contact you?",
+      "whatsapp": "WhatsApp",
+      "email": "Email"
+    },
+    "otpChannel": {
+      "title": "Choose verification method",
+      "hint": "We'll send you a 6-digit code"
+    },
+    "fields": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "phoneHint": "Enter 9 digits starting with 5",
+      "specialty": "Specialty",
+      "specialtyOther": "Specify your specialty",
+      "clinicName": "Clinic Name",
+      "otp": "Verification Code"
+    },
+    "specialties": {
+      "generalDentistry": "General Dentistry",
+      "orthodontics": "Orthodontics",
+      "periodontics": "Periodontics",
+      "endodontics": "Endodontics",
+      "prosthodontics": "Prosthodontics",
+      "oralSurgery": "Oral Surgery",
+      "pediatricDentistry": "Pediatric Dentistry",
+      "cosmeticDentistry": "Cosmetic Dentistry",
+      "implantology": "Implantology",
+      "oralPathology": "Oral Pathology",
+      "other": "Other"
+    },
+    "steps": {
+      "step1": "Personal Info",
+      "step2": "Professional Info"
+    },
+    "buttons": {
+      "next": "Next",
+      "back": "Back",
+      "submit": "Submit"
+    },
+    "sendOtp": "Send Verification Code",
+    "verify": "Verify & Continue",
+    "sending": "Sending...",
+    "verifying": "Verifying...",
+    "otp": {
+      "sentTo": "Verification code sent to:",
+      "resendIn": "Resend code in",
+      "seconds": "seconds",
+      "resend": "Resend Code"
+    },
+    "errors": {
+      "emailRequired": "Email address is required",
+      "emailTooLong": "Email address is too long (max 254 characters)",
+      "invalidEmailFormat": "Please enter a valid email address",
+      "phoneRequired": "Phone number is required",
+      "phoneOnlyNumbers": "Phone number must contain only numbers",
+      "phoneLength": "Phone number must be exactly 9 digits",
+      "phoneStartWith5": "Phone number must start with 5",
+      "firstNameRequired": "First name is required",
+      "firstNameTooShort": "First name must be at least 2 characters",
+      "firstNameTooLong": "First name is too long (max 50 characters)",
+      "firstNameInvalidCharacters": "First name contains invalid characters",
+      "lastNameRequired": "Last name is required",
+      "lastNameTooShort": "Last name must be at least 2 characters",
+      "lastNameTooLong": "Last name is too long (max 50 characters)",
+      "lastNameInvalidCharacters": "Last name contains invalid characters",
+      "clinicNameRequired": "Clinic name is required",
+      "clinicNameTooShort": "Clinic name must be at least 2 characters",
+      "clinicNameTooLong": "Clinic name is too long (max 100 characters)",
+      "specialtyRequired": "Please select your specialty",
+      "specialtyOtherRequired": "Please specify your specialty",
+      "specialtyOtherTooShort": "Specialty must be at least 2 characters",
+      "specialtyOtherTooLong": "Specialty is too long (max 100 characters)",
+      "otpRequired": "Verification code is required",
+      "otpInvalid": "Verification code must be 6 digits",
+      "serverError": "An error occurred. Please try again."
+    },
+    "success": {
+      "otpSent": "Verification code sent successfully",
+      "loginSuccess": "Login successful! Redirecting...",
+      "registerSuccess": "Registration successful! Redirecting..."
+    }
+  },
+  "dashboard": {
+    "myCases": {
+      "title": "My Cases",
+      "subtitle": "Manage and track all your dental case submissions"
+    },
+    "stats": {
+      "total": "Total Cases",
+      "pending": "Pending",
+      "active": "Active",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "filters": {
+      "search": "Search",
+      "searchPlaceholder": "Search by case number...",
+      "status": "Status",
+      "allStatuses": "All Statuses",
+      "category": "Procedure Category",
+      "allCategories": "All Categories"
+    },
+    "table": {
+      "caseNumber": "Case Number",
+      "category": "Procedure Category",
+      "status": "Status",
+      "submitted": "Submitted",
+      "updated": "Last Updated",
+      "actions": "Actions",
+      "view": "View Details"
+    },
+    "empty": {
+      "title": "No cases found",
+      "description": "Get started by creating your first case",
+      "createCase": "Create New Case"
+    }
+  },
+  "newCase": {
+    "title": "New Case",
+    "subtitle": "Submit a new dental case for study and guide fabrication",
+    "optional": "Optional",
+    "steps": {
+      "caseDetails": "Case Details",
+      "fileUpload": "Upload Files",
+      "delivery": "Delivery",
+      "review": "Review & Submit"
+    },
+    "caseDetails": {
+      "title": "Case Details",
+      "subtitle": "Provide information about the procedure and patient"
+    },
+    "fields": {
+      "patientRef": "Patient Reference",
+      "procedureCategory": "Procedure Category",
+      "guideType": "Guide Type",
+      "requiredService": "Required Service",
+      "teethSelection": "Teeth Selection",
+      "implantSystem": "Implant System",
+      "implantSystemOther": "Specify Implant System",
+      "clinicalNotes": "Clinical Notes",
+      "deliveryMethod": "Delivery Method",
+      "deliveryAddress": "Delivery Address",
+      "pickupBranch": "Pickup Branch"
+    },
+    "placeholders": {
+      "patientRef": "Patient ID or name for your records",
+      "implantSystem": "Select implant system...",
+      "implantSystemOther": "Specify implant system...",
+      "clinicalNotes": "Add any clinical notes or special instructions..."
+    },
+    "hints": {
+      "patientRef": "This is for your reference only and won't be shared"
+    },
+    "fileUpload": {
+      "title": "Upload Files",
+      "subtitle": "Select files to upload with your case",
+      "dicom": "DICOM Files",
+      "dicomDesc": "CBCT or CT scans",
+      "ctScan": "CT Scan",
+      "ctScanDesc": "CT scan files",
+      "stl": "STL Files",
+      "stlDesc": "3D scan files",
+      "clinicalPhoto": "Clinical Photos",
+      "clinicalPhotoDesc": "Patient photos",
+      "prescription": "Prescription",
+      "prescriptionDesc": "Treatment plan/prescription",
+      "other": "Other Files",
+      "otherDesc": "ZIP, PDF, etc.",
+      "selectFiles": "Select files",
+      "clickToUpload": "Click to upload",
+      "dragAndDrop": "or drag and drop",
+      "uploading": "Uploading...",
+      "files": "files",
+      "filesReady": "files ready to upload",
+      "fileTooLarge": "File size exceeds 100MB",
+      "uploadFailed": "Upload failed. Please try again.",
+      "stageNotice": "Files will be uploaded when you submit the case",
+      "notice": "Maximum file size is 100MB. Supported formats: DICOM, STL, images, PDF, ZIP."
+    },
+    "delivery": {
+      "title": "Delivery Details",
+      "subtitle": "Choose how you want to receive the surgical guide",
+      "deliveryToAddress": "Delivery to Address",
+      "deliveryDesc": "We'll ship the guide to your address",
+      "pickupFromBranch": "Pickup from Branch",
+      "pickupDesc": "Pick up from our nearest branch",
+      "noAddresses": "No delivery addresses",
+      "addAddressFirst": "Please add a delivery address in your profile",
+      "addAddress": "Add Address"
+    },
+    "review": {
+      "title": "Review & Submit",
+      "subtitle": "Review your case details before submission",
+      "caseDetails": "Case Details",
+      "uploadedFiles": "Uploaded Files",
+      "filesUploaded": "files uploaded",
+      "deliveryDetails": "Delivery Details",
+      "termsText": "I agree to the terms and conditions",
+      "termsDescription": "By submitting this case, you agree to pay the study fee of 100 SAR",
+      "importantNotice": "Important Notice",
+      "paymentNotice": "A study fee of 100 SAR is required before case processing begins"
+    },
+    "modal": {
+      "successTitle": "Success!",
+      "errorTitle": "Error",
+      "close": "Close"
+    },
+    "upload": {
+      "uploading": "Uploading Files...",
+      "progress": "File",
+      "of": "of",
+      "pleaseWait": "Please wait, do not close this window"
+    },
+    "errors": {
+      "procedureCategoryRequired": "Please select a procedure category",
+      "guideTypeRequired": "Please select a guide type",
+      "requiredServiceRequired": "Please select a required service",
+      "implantSystemOtherRequired": "Please specify the implant system",
+      "teethRequired": "Please select at least one tooth",
+      "deliveryMethodRequired": "Please select a delivery method",
+      "deliveryAddressRequired": "Please select a delivery address",
+      "pickupBranchRequired": "Please select a pickup branch",
+      "termsRequired": "Please accept the terms and conditions",
+      "validationFailed": "Please fix the errors before proceeding",
+      "submitFailed": "Failed to submit case. Please try again."
+    },
+    "success": {
+      "caseSubmitted": "Case submitted successfully! Redirecting..."
+    },
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit Case",
+    "submitting": "Submitting...",
+    "studyFeeNotice": "Study Fee",
+    "studyFeeAmount": "100 SAR (required before case processing)"
+  },
+  "viewCase": {
+    "title": "Case Details",
+    "backToCases": "Back to Cases",
+    "patientRef": "Patient Reference",
+    "tabs": {
+      "details": "Details",
+      "history": "Status History",
+      "comments": "Comments"
+    },
+    "caseInformation": "Case Information",
+    "uploadedFiles": "Uploaded Files",
+    "clientInformation": "Client Information",
+    "statusHistory": "Status History",
+    "noHistory": "No status history available",
+    "changedBy": "Changed by",
+    "fields": {
+      "caseNumber": "Case Number",
+      "patientRef": "Patient Reference",
+      "procedureCategory": "Procedure Category",
+      "guideType": "Guide Type",
+      "requiredService": "Required Service",
+      "implantSystem": "Implant System",
+      "teethNumbers": "Teeth Numbers",
+      "submittedAt": "Submitted At",
+      "deliveryMethod": "Delivery Method",
+      "clinicalNotes": "Clinical Notes",
+      "clientName": "Client Name",
+      "clientType": "Client Type"
+    },
+    "comments": {
+      "title": "Comments",
+      "placeholder": "Write a comment...",
+      "attachFile": "Attach File",
+      "uploading": "Uploading...",
+      "submit": "Submit",
+      "submitting": "Submitting...",
+      "noComments": "No comments yet. Be the first to comment!",
+      "fileTooLarge": "File size must be less than 10MB",
+      "submitFailed": "Failed to submit comment. Please try again."
+    },
+    "errors": {
+      "loadFailed": "Failed to load case details"
+    }
+  },
+  "status": {
+    "submitted": "Submitted",
+    "pending": "Pending Review",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "rejected": "Rejected"
+  },
+  "procedureCategory": {
+    "single_implant": "Single Implant",
+    "multiple_implant": "Multiple Implants",
+    "full_arch": "Full Arch",
+    "gbr": "GBR",
+    "other": "Other"
+  },
+  "guideType": {
+    "tooth_support": "Tooth Support",
+    "tissue_support": "Tissue Support",
+    "bone_support": "Bone Support",
+    "stackable": "Stackable",
+    "hybrid": "Hybrid",
+    "other": "Other"
+  },
+  "requiredService": {
+    "study_only": "Study Only",
+    "full_solution": "Full Solution"
+  },
+  "deliveryMethod": {
+    "delivery": "Delivery to Address",
+    "pickup": "Pickup from Branch"
+  },
+  "fileCategory": {
+    "dicom": "DICOM Files",
+    "ct_scan": "CT Scan",
+    "stl": "STL Files",
+    "clinical_photo": "Clinical Photos",
+    "prescription": "Prescription",
+    "other": "Other Files"
+  },
+  "clientType": {
+    "dentist": "Dentist",
+    "clinic": "Clinic",
+    "lab": "Lab"
+  },
+  "changedBy": {
+    "client": "Client",
+    "designer": "Designer",
+    "admin": "Admin",
+    "system": "System"
+  },
+  "commentedBy": {
+    "client": "Client",
+    "designer": "Designer"
+  },
+  "common": {
+    "loading": "Loading...",
+    "close": "Close",
+    "default": "Default"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next"
+  }
+}

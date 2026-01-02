@@ -4,7 +4,7 @@ export { getCases } from "./get-cases.controller.js";
 export { getCaseStatusHistory } from "./get-status-history.controller.js";
 export { getCaseStats } from "./stats.controller.js";
 export { createCase } from "./create-case.controller.js";
-import {
+export {
   isTransitionAllowed,
   getAllowedStatuses,
   updateCaseStatus,

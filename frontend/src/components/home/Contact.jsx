@@ -35,10 +35,10 @@ const Contact = ({ onSubmitCaseClick }) => {
         <div className="max-w-3xl mx-auto text-center">
           <div className="animate-fade-in">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary dark:text-light mb-3">
-              {t("contact.ready")}
+              {t("contact.title")}
             </h2>
             <p className="text-base sm:text-lg text-light/80 mb-8">
-              {t("contact.description")}
+              {t("contact.subtitle")}
             </p>
 
             <button

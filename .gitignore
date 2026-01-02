@@ -140,3 +140,5 @@ vite.config.ts.timestamp-*
 
 
 uploads/*
+
+*/_archive*

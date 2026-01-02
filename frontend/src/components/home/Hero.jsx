@@ -74,7 +74,7 @@ const Hero = ({ onSubmitCaseClick }) => {
               onClick={handleSubmitCase}
               className="inline-flex items-center gap-2 px-6 py-3 bg-light hover:bg-light/90 text-primary rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
             >
-              Submit Case
+              {t("hero.submitCase")}
               <svg
                 className="w-5 h-5"
                 fill="none"

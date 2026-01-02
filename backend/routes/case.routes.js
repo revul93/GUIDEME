@@ -8,10 +8,14 @@ import {
   getCaseStats,
   updateCase,
 } from "../controllers/case/index.js";
+import {
+  updateCaseStatus,
+  getAllowedStatuses,
+} from "../controllers/case/case-status.controller.js";
 
 const router = express.Router();
 
-// Stats endpoint
+// Stats endpoint (must be before /:id routes)
 router.get("/stats", authenticate, getCaseStats);
 
 // List and create cases
@@ -21,6 +25,10 @@ router.post("/", authenticate, createCase);
 // Specific case operations
 router.get("/:id", authenticate, getCase);
 router.put("/:id", authenticate, updateCase);
+
+// Case status operations
+router.patch("/:id/status", authenticate, updateCaseStatus);
+router.get("/:id/allowed-statuses", authenticate, getAllowedStatuses);
 
 // Case status history
 router.get("/:id/status-history", authenticate, getCaseStatusHistory);

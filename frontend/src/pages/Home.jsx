@@ -12,10 +12,8 @@ const Home = ({ onSubmitCaseClick }) => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalType, setAuthModalType] = useState("register");
   useEffect(() => {
-    // Smooth scroll behavior
     document.documentElement.style.scrollBehavior = "smooth";
 
-    // Intersection Observer for 3D fade-in animations
     const observerOptions = {
       threshold: 0.15,
       rootMargin: "0px 0px -10% 0px",
@@ -31,7 +29,6 @@ const Home = ({ onSubmitCaseClick }) => {
       });
     }, observerOptions);
 
-    // Observe all sections with slight delay for cascade effect
     const sections = document.querySelectorAll(".section-animate");
     sections.forEach((section, index) => {
       setTimeout(() => {
@@ -86,7 +83,6 @@ const Home = ({ onSubmitCaseClick }) => {
         onSwitchType={(type) => setAuthModalType(type)}
         onSuccess={() => {
           setAuthModalOpen(false);
-          window.location.reload();
         }}
       />
     </div>

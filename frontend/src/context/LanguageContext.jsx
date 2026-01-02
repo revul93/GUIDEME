@@ -13,7 +13,12 @@ export const useLanguage = () => {
 
 export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState(() => {
-    return localStorage.getItem("language") || "en";
+    const saved = localStorage.getItem("language");
+    if (saved) {
+      saved;
+    } else {
+      return "en";
+    }
   });
 
   const [direction, setDirection] = useState(language === "ar" ? "rtl" : "ltr");

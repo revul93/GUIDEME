@@ -8,32 +8,24 @@ const Team = () => {
       name: t("team.member1.name"),
       role: t("team.member1.role"),
       bio: t("team.member1.bio"),
-      cases: 150,
-      experience: "15y",
     },
     {
       id: 2,
       name: t("team.member2.name"),
       role: t("team.member2.role"),
       bio: t("team.member2.bio"),
-      cases: 120,
-      experience: "10y",
     },
     {
       id: 3,
       name: t("team.member3.name"),
       role: t("team.member3.role"),
       bio: t("team.member3.bio"),
-      cases: 200,
-      experience: "8y",
     },
     {
       id: 4,
       name: t("team.member4.name"),
       role: t("team.member4.role"),
       bio: t("team.member4.bio"),
-      cases: 300,
-      experience: "5y",
     },
   ];
 
@@ -90,28 +82,6 @@ const Team = () => {
               <p className="text-xs text-charcoal dark:text-gray-400 mb-4">
                 {member.bio}
               </p>
-
-              {/* Stats */}
-              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <div className="text-xl font-bold text-accent dark:text-accent-secondary">
-                      {member.cases}
-                    </div>
-                    <div className="text-xs text-charcoal dark:text-gray-400">
-                      {t("team.cases")}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-xl font-bold text-accent dark:text-accent-secondary">
-                      {member.experience}
-                    </div>
-                    <div className="text-xs text-charcoal dark:text-gray-400">
-                      {t("team.experience")}
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           ))}
         </div>
